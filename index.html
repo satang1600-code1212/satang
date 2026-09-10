@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark only">
+<meta name="theme-color" content="#000000">
+<title>Satang Check List</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@300;400;500;600&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#000000;
+  --panel:#14181A;
+  --panel-2:#1A1F21;
+  --rule:#3A4448;
+  --rule-soft:#2A3236;
+  --text:#F2F4F4;
+  --dim:#BAC3C5;
+  --faint:#96A1A4;
+  --gold:#E8B93F;
+  --gold-soft:#B08F2E;
+  --ember:#E2755A;
+  --sage:#8FC48A;
+  --r:3px;
+}
+*{box-sizing:border-box}
+html,body{
+  margin:0;padding:0;
+  background:#000 !important;
+  color-scheme:dark;
+}
+/* painted layer: survives hosts that override the body background */
+body::before{
+  content:"";position:fixed;inset:0;background:#000;z-index:-1;pointer-events:none;
+}
+body{
+  background:var(--ink);
+  color:var(--text);
+  font-family:"IBM Plex Sans Thai","Bai Jamjuree",system-ui,sans-serif;
+  font-weight:400;
+  font-size:18px;
+  line-height:2;
+  -webkit-font-smoothing:antialiased;
+  padding:0 0 96px;
+}
+.wrap{max-width:660px;margin:0 auto;padding:0 22px;position:relative;z-index:1}
+
+/* ---------- hero ---------- */
+header{padding:56px 0 34px}
+.kicker{
+  font-family:"Bai Jamjuree",sans-serif;
+  font-weight:500;font-size:15px;letter-spacing:.12em;
+  color:var(--faint);line-height:1;
+}
+h1{
+  font-family:"Bai Jamjuree",sans-serif;
+  font-weight:300;font-size:clamp(34px,9.5vw,52px);
+  letter-spacing:-.02em;line-height:1;
+  margin:16px 0 0;color:#EDF0F0;
+}
+.creed{
+  margin:30px 0 0;padding:20px 0 0;
+  border-top:1px solid var(--rule);
+}
+.creed p{
+  margin:0;font-family:"Bai Jamjuree",sans-serif;
+  font-weight:500;font-size:17px;letter-spacing:.06em;
+  color:#F2F4F4;line-height:1.85;
+}
+.creed p+p{color:var(--gold)}
+.creed .note{
+  font-family:"IBM Plex Sans Thai",sans-serif;letter-spacing:0;
+  font-size:16.5px;color:var(--dim);margin-top:14px;font-weight:400;line-height:1.9;
+}
+
+/* ---------- meta ---------- */
+.meta{
+  display:flex;flex-wrap:wrap;gap:14px 26px;
+  padding:22px 0 30px;border-bottom:1px solid var(--rule-soft);
+}
+.meta label{display:flex;flex-direction:column;gap:2px;flex:1 1 120px}
+.meta span{font-size:14.5px;color:var(--faint);letter-spacing:.02em}
+
+input[type=text],input[type=number],textarea{
+  background:transparent;border:none;border-bottom:1px solid var(--rule);
+  color:var(--gold);font-family:"Bai Jamjuree",sans-serif;
+  font-weight:500;font-size:17px;padding:6px 2px;width:100%;
+  transition:border-color .18s;
+}
+input::placeholder,textarea::placeholder{color:#6B7578;font-weight:400}
+input:focus,textarea:focus{outline:none;border-bottom-color:var(--gold)}
+input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
+textarea{
+  border:1px solid var(--rule);border-radius:var(--r);resize:vertical;
+  min-height:70px;line-height:1.85;color:var(--text);font-size:17px;padding:12px 14px;
+}
+
+/* ---------- sections ---------- */
+section{padding:38px 0;border-bottom:1px solid var(--rule-soft)}
+.head{display:flex;align-items:baseline;gap:14px;margin-bottom:6px}
+.num{
+  font-family:"Bai Jamjuree",sans-serif;font-weight:600;font-size:15px;
+  color:var(--gold);border:1px solid var(--gold-soft);border-radius:var(--r);
+  min-width:30px;height:28px;display:inline-flex;align-items:center;justify-content:center;
+  flex:none;line-height:1;
+}
+h2{
+  font-family:"Bai Jamjuree",sans-serif;font-weight:500;
+  font-size:26px;margin:0;letter-spacing:.01em;color:#FFFFFF;
+}
+.sub{color:var(--dim);font-size:16.5px;margin:0 0 24px 44px;line-height:1.8}
+
+/* ---------- checklist ---------- */
+.item{
+  display:flex;gap:16px;align-items:flex-start;
+  padding:18px 0;border-top:1px solid var(--rule-soft);cursor:pointer;
+}
+.item:first-of-type{border-top:none}
+.item input{position:absolute;opacity:0;width:0;height:0}
+.box{
+  flex:none;width:24px;height:24px;margin-top:6px;border-radius:var(--r);
+  border:1.5px solid #5A6468;position:relative;transition:border-color .18s,background .18s;
+}
+.box::after{
+  content:"";position:absolute;left:7.5px;top:2.5px;width:6px;height:12px;
+  border:solid var(--ink);border-width:0 2.5px 2.5px 0;transform:rotate(43deg) scale(.4);
+  opacity:0;transition:opacity .15s,transform .15s;
+}
+.item input:checked~.box{background:var(--gold);border-color:var(--gold)}
+.item input:checked~.box::after{opacity:1;transform:rotate(43deg) scale(1)}
+.item input:focus-visible~.box{outline:2px solid var(--gold-soft);outline-offset:3px}
+.body{flex:1;min-width:0}
+.title{color:#FFFFFF;font-weight:500;font-size:18.5px;line-height:1.6;transition:color .18s}
+.item input:checked~.body .title{color:var(--faint)}
+.desc{color:var(--dim);font-size:16.5px;line-height:1.75;display:block;margin-top:4px}
+.item:hover .box{border-color:var(--gold-soft)}
+
+.aside{
+  margin:14px 0 0;padding:16px 18px;background:var(--panel);
+  border-left:3px solid var(--gold-soft);border-radius:0 var(--r) var(--r) 0;
+  font-size:16.5px;line-height:1.85;color:#DDE3E4;
+}
+.aside b{color:var(--gold);font-weight:600}
+
+/* fill-in rows */
+.fields{margin:20px 0 0 44px;display:flex;flex-wrap:wrap;gap:16px 22px}
+.fields label{display:flex;flex-direction:column;gap:3px;flex:1 1 110px}
+.fields span{font-size:14.5px;color:var(--faint)}
+.rr{
+  margin:22px 0 0 44px;padding:18px 20px;background:var(--panel);
+  border:1px solid var(--rule);border-radius:var(--r);
+}
+.rr .row{display:flex;flex-wrap:wrap;gap:16px 20px}
+.rr .row label{display:flex;flex-direction:column;gap:3px;flex:1 1 100px}
+.rr .row span{font-size:14.5px;color:var(--faint)}
+.rrout{
+  margin-top:18px;padding-top:16px;border-top:1px solid var(--rule-soft);
+  font-family:"IBM Plex Sans Thai",sans-serif;font-size:16px;color:var(--dim);
+  display:flex;justify-content:space-between;align-items:baseline;gap:14px;
+}
+.rrval{font-family:"Bai Jamjuree",sans-serif;font-size:30px;font-weight:500;color:var(--faint);letter-spacing:.01em;white-space:nowrap}
+.rrval.pass{color:var(--sage)}
+.rrval.fail{color:var(--ember)}
+
+/* ---------- wait block ---------- */
+.wait{
+  margin-top:14px;padding:24px 22px;background:var(--panel);
+  border:1px solid #3A2A24;border-radius:var(--r);
+}
+.wait h3{
+  font-family:"Bai Jamjuree",sans-serif;font-weight:600;font-size:20px;
+  margin:0 0 6px;color:var(--ember);line-height:1.5;
+}
+.wait p{margin:0 0 20px;color:var(--dim);font-size:16.5px;line-height:1.8}
+.wait label{display:block;margin-bottom:18px}
+.wait label>span{display:block;font-size:15.5px;color:#C3CBCD;margin-bottom:8px;line-height:1.6}
+
+/* ---------- verdict bar ---------- */
+.bar{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;
+  background:#000;border-top:1px solid var(--rule);
+}
+.bar .wrap{display:flex;align-items:center;gap:16px;padding-top:13px;padding-bottom:13px}
+.track{flex:1;min-width:0}
+.state{
+  font-family:"Bai Jamjuree",sans-serif;font-size:22px;font-weight:600;
+  letter-spacing:.06em;color:var(--ember);line-height:1.3;
+}
+.state.ok{color:var(--sage)}
+.count{font-size:15px;color:var(--faint);letter-spacing:.02em;line-height:1.6}
+.gauge{height:3px;background:var(--rule-soft);margin-top:9px;border-radius:2px;overflow:hidden}
+.fill{height:100%;width:0;background:var(--ember);transition:width .3s ease,background .3s}
+.fill.ok{background:var(--sage)}
+.reset{
+  flex:none;background:transparent;border:1px solid var(--rule);color:var(--dim);
+  font-family:"IBM Plex Sans Thai",sans-serif;font-size:15.5px;font-weight:400;
+  padding:10px 17px;border-radius:var(--r);cursor:pointer;transition:.18s;
+}
+.reset:hover{border-color:var(--gold-soft);color:var(--gold)}
+.reset:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+
+.hint{margin-top:10px;font-size:15px;line-height:1.7;color:var(--faint)}
+.brokerbox{margin-top:18px;border-top:1px solid var(--rule-soft);padding-top:14px}
+.brokerbox summary{
+  cursor:pointer;color:var(--gold);font-size:15.5px;font-weight:500;
+  list-style:none;display:inline-flex;align-items:center;gap:8px;
+}
+.brokerbox summary::-webkit-details-marker{display:none}
+.brokerbox summary::before{content:"+";font-size:17px;line-height:1}
+.brokerbox[open] summary::before{content:"–"}
+.brokerbox summary:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
+.memnote{
+  margin:12px 0 0 44px;font-size:15px;line-height:1.7;color:var(--faint);
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;
+}
+.memnote.warn{color:var(--ember)}
+.linkbtn{
+  background:none;border:none;padding:0;cursor:pointer;
+  font-family:"IBM Plex Sans Thai",sans-serif;font-size:15px;font-weight:500;
+  color:var(--gold);border-bottom:1px solid var(--gold-soft);line-height:1.4;
+}
+.linkbtn:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
+
+.stats{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:2px;background:var(--rule-soft);border:1px solid var(--rule);
+  border-radius:var(--r);overflow:hidden;margin-top:6px;
+}
+.stat{background:#0F1315;padding:16px 18px}
+.stat .k{font-size:14.5px;color:var(--faint);line-height:1.5}
+.stat .v{
+  font-family:"Bai Jamjuree",sans-serif;font-size:24px;font-weight:500;
+  color:var(--text);line-height:1.35;margin-top:2px;
+}
+.stat .v.pass{color:var(--sage)}
+.stat .v.fail{color:var(--ember)}
+.curve{
+  margin-top:20px;padding:18px;background:var(--panel);
+  border:1px solid var(--rule);border-radius:var(--r);
+}
+.curve svg{display:block;width:100%;height:120px}
+.curve .cap{font-size:14.5px;color:var(--faint);margin-top:12px;line-height:1.6}
+.split{
+  margin-top:20px;padding:18px 20px;background:var(--panel);
+  border:1px solid var(--rule);border-radius:var(--r);
+  font-size:16px;line-height:1.9;color:var(--dim);
+}
+.split b{color:var(--gold);font-weight:600}
+
+.tools{
+  margin-top:34px;padding:22px 20px;background:var(--panel);
+  border:1px solid var(--rule);border-radius:var(--r);
+}
+.tools h3{
+  font-family:"Bai Jamjuree",sans-serif;font-weight:600;font-size:19px;
+  margin:0 0 6px;color:var(--gold);line-height:1.5;
+}
+.tools p{margin:0 0 18px;color:var(--dim);font-size:16px;line-height:1.8}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.btn{
+  flex:1 1 160px;background:transparent;border:1px solid var(--rule);color:var(--text);
+  font-family:"IBM Plex Sans Thai",sans-serif;font-size:16px;font-weight:500;
+  padding:13px 16px;border-radius:var(--r);cursor:pointer;transition:.18s;text-align:center;
+}
+.btn:hover{border-color:var(--gold);color:var(--gold)}
+.btn:focus-visible{outline:2px solid var(--gold-soft);outline-offset:2px}
+.btn.primary{border-color:var(--gold-soft);color:var(--gold)}
+.btn.primary:hover{background:rgba(232,185,63,.1)}
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%) translateY(14px);
+  bottom:108px;z-index:40;max-width:92vw;
+  background:#1C2225;border:1px solid var(--rule);border-radius:var(--r);
+  padding:13px 18px;color:var(--text);font-size:15.5px;line-height:1.6;
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+footer{padding:42px 0 10px;color:var(--faint);font-size:15px;line-height:1.85}footer .q{color:var(--text);font-size:17px;margin-bottom:22px;line-height:1.8}
+footer .q b{color:var(--gold);font-weight:600}
+
+@media (max-width:460px){
+  .wrap{padding:0 18px}
+  .sub,.fields,.rr,.memnote{margin-left:0}
+  .state{font-size:19px}
+  .count{font-size:14px}
+  .reset{padding:9px 13px;font-size:14.5px}
+  .rrout{flex-direction:column;align-items:flex-start;gap:6px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="kicker">เช็กอินก่อนเทรด</div>
+  <h1>Satang Check List</h1>
+  <div class="creed">
+    <p>NO CONFIRMATION = NO TRADE</p>
+    <p>WAIT IS A POSITION</p>
+    <p class="note">ห้ามกระโดดจาก Zone ไป Entry — ติ๊กเฉพาะสิ่งที่เกิดขึ้นจริง ไม่ใช่สิ่งที่คาดว่าจะเกิด</p>
+  </div>
+
+  <div class="meta">
+    <label><span>วันที่</span><input type="text" placeholder="10.09.2026"></label>
+    <label><span>สินค้า</span><input type="text" placeholder="XAUUSD"></label>
+    <label><span>Timeframe</span><input type="text" placeholder="H1"></label>
+  </div>
+</header>
+
+<section>
+  <div class="head"><span class="num">0</span><h2>ก่อนเปิดจอ</h2></div>
+  <p class="sub">ตัวกรองวัน — บางวันคำตอบที่ถูกคือไม่เปิดเลย</p>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">สภาพร่างกายและอารมณ์</span>
+    <span class="desc">นอนพอ ไม่ได้เทรดเพราะเบื่อ เครียด หรืออยากเอาคืน</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">ข่าวสำคัญ</span>
+    <span class="desc">เช็กปฏิทินแล้ว รู้เวลาข่าว และกำหนดระยะเว้นก่อน/หลังไว้ชัด</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">อยู่ในช่วงเวลาที่วางแผนไว้</span>
+    <span class="desc">ไม่ใช่เทรดนอกเวลาเพราะบังเอิญเปิดจอมาเจอ</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">ยังไม่ถึงเพดานของวัน</span>
+    <span class="desc">ขาดทุนติดกันตามจำนวนที่ตั้งไว้ = ปิดจอ</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">รู้สถานะบัญชีและไม้ที่ค้างอยู่</span>
+    <span class="desc">Equity ต่ำกว่า Balance แปลว่ายังลอยลบอยู่ การเปิดเพิ่มคือทบความเสี่ยงเดิม ไม่ใช่การกระจาย</span></span></label>
+
+  <div class="fields">
+    <label><span>เว้นข่าว (นาที)</span><input type="text" placeholder="30"></label>
+    <label><span>แพ้ติดกันได้</span><input type="text" placeholder="2 ไม้"></label>
+    <label><span>เข้าได้สูงสุด</span><input type="text" placeholder="3 ไม้/วัน"></label>
+    <label><span>ขาดทุนสูงสุดของวัน (%)</span><input type="number" step="any" id="cap" placeholder="3"></label>
+  </div>
+
+  <div class="rr">
+    <div class="row">
+      <label><span>Balance</span><input type="number" step="any" id="bal" placeholder="10000"></label>
+      <label><span>Equity</span><input type="number" step="any" id="eq" placeholder="9850"></label>
+      <label><span>สกุลเงินบัญชี</span><input type="text" id="cur" placeholder="USD"></label>
+      <label><span>ทุนตั้งต้น</span><input type="number" step="any" id="start" placeholder="10000"></label>
+    </div>
+    <div class="rrout">
+      <span id="accmsg">กรอก Balance และ Equity เพื่อดูต้นทุนที่ค้างอยู่</span>
+      <span class="rrval" id="accval">—</span>
+    </div>
+  </div>
+
+  <div class="memnote" id="memnote">
+    <span id="memtext">ค่าบัญชีจะถูกจำไว้ให้ในเครื่องนี้</span>
+    <button class="linkbtn" id="memclear" type="button" hidden>ลืมค่าที่จำไว้</button>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="num">1</span><h2>โครงสร้างและแผน</h2></div>
+  <p class="sub">ภาพใหญ่ต้องชัดก่อน แล้วจึงลงมาหาพื้นที่</p>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">Context</span>
+    <span class="desc">โครงสร้าง D1/H4 ชัด และ Liquidity ชัด พร้อมบริบท H1</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">Zone</span>
+    <span class="desc">วางไว้ตาม Context ล่วงหน้า และไม่ได้อยู่บริเวณ EQ หรือกลางกรอบ</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">รู้ว่าไม้นี้ตามหรือสวนโครงสร้างใหญ่</span>
+    <span class="desc">ถ้าสวน H4/D1 ต้องรู้ตัวตั้งแต่ก่อนเข้า ไม่ใช่มารู้ตอนติดลบ</span></span></label>
+
+  <div class="fields">
+    <label><span>ไบแอสวันนี้</span><input type="text" placeholder="Buy / Sell"></label>
+    <label><span>เพราะอะไร</span><input type="text" placeholder="D1 ยังทำ HH และ Liquidity อยู่ด้านบน"></label>
+  </div>
+
+  <div class="aside">
+    ถามตัวเองก่อนติ๊ก: <b>โซนนี้ mark ไว้ตั้งแต่ก่อนราคาวิ่งมาถึงหรือเปล่า</b><br>
+    ถ้าเพิ่งวาดสด ๆ ในนาทีนี้ คือกำลังฝืนหา Setup — และ Zone อย่างเดียวไม่ใช่ Trigger มันคือพื้นที่เฝ้า
+  </div>
+  <div class="aside">
+    เขียนไบแอสไว้ก่อน แล้วค่อยหา Setup ที่ตรงกับมัน — <b>ถ้าไม่เขียนไว้ ทุกสัญญาณจะดูเข้าทางเสมอ</b>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="num">2</span><h2>การยืนยัน</h2></div>
+  <p class="sub">ต้องเกิดขึ้นจริงทั้งสี่ข้อ ห้ามเดา ห้ามข้าม</p>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">Sweep</span>
+    <span class="desc">ราคาเก็บ Liquidity ตาม Scenario แล้วจริง</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">Displacement</span>
+    <span class="desc">มีแรงส่งชัดเจนหลัง Sweep ไม่ใช่เด้งเบา ๆ</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">MSS / CHoCH</span>
+    <span class="desc">โครงสร้างเปลี่ยนตามเกณฑ์ ไม่ใช่เพียงคาดการณ์</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">QM / OB / FVG Retest</span>
+    <span class="desc">ราคากลับมาทดสอบหลัง Structure ยืนยันครบ</span></span></label>
+</section>
+
+<section>
+  <div class="head"><span class="num">3</span><h2>ความเสี่ยง</h2></div>
+  <p class="sub">เขียนตัวเลขให้ครบก่อนกดเข้า ไม่ใช่หลังเข้า</p>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">ความเสี่ยงเท่าเดิมทุกไม้</span>
+    <span class="desc">ไม่เพิ่มขนาดเพราะรู้สึกมั่นใจ ไม่เพิ่มเพราะอยากได้คืน</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">รู้ว่าแผนตายตรงไหน</span>
+    <span class="desc">SL วางตามเหตุผลเชิงโครงสร้าง ไม่ใช่ระยะที่ทำให้ RR ดูสวย</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">RR ≥ 1:3</span>
+    <span class="desc">ผ่านตั้งแต่ก่อนเข้า โดยไม่ย้ายเป้าหมายหรือแต่งเหตุผลย้อนหลัง</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">TP วางบนเป้าที่มีอยู่จริง</span>
+    <span class="desc">Liquidity หรือโครงสร้างฝั่งตรงข้ามที่เห็นบนชาร์ต ไม่ใช่ระยะที่ใส่เข้าไปให้ RR ผ่าน</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">มีแผนบริหารไม้แล้ว</span>
+    <span class="desc">รู้ล่วงหน้าว่าจะเลื่อน BE เมื่อไหร่ และจะปิดบางส่วนตรงไหน</span></span></label>
+
+  <div class="rr">
+    <div class="row">
+      <label><span>Entry</span><input type="number" step="any" id="e" placeholder="4418"></label>
+      <label><span>Stop Loss</span><input type="number" step="any" id="s" placeholder="4396"></label>
+      <label><span>Take Profit</span><input type="number" step="any" id="t" placeholder="4485"></label>
+    </div>
+
+    <input type="hidden" id="mode" value="pct">
+    <div class="row" style="margin-top:18px">
+      <label><span>เสี่ยงต่อไม้ (%)</span><input type="number" step="any" id="risk" placeholder="1"></label>
+      <label><span>เท่ากับกี่ล็อต</span><input type="number" step="any" id="lot" placeholder="0.04"></label>
+    </div>
+    <div class="hint" id="synchint">กรอกช่องไหนก็ได้ อีกช่องจะคำนวณให้เอง</div>
+
+    <details class="brokerbox">
+      <summary>ตั้งค่าโบรก ตั้งครั้งเดียวแล้วจำไว้ให้</summary>
+      <div class="row" style="margin-top:14px">
+        <label><span>ขนาดสัญญา (หน่วย/ล็อต)</span><input type="number" step="any" id="cs" placeholder="100"></label>
+        <label><span>สเต็ปล็อตขั้นต่ำ</span><input type="number" step="any" id="lstep" placeholder="0.01"></label>
+      </div>
+      <div class="hint">ทองมาตรฐานคือ 100 หน่วยต่อล็อต และสเต็ป 0.01 ถ้าไม่แน่ใจให้ปล่อยไว้แบบนี้</div>
+    </details>
+
+    <div class="rrout">
+      <span id="rrmsg">กรอกสามช่องเพื่อคำนวณ</span>
+      <span class="rrval" id="rrval">—</span>
+    </div>
+    <div class="rrout">
+      <span id="sizemsg">กรอก Balance และ % ความเสี่ยง เพื่อดูเงินที่เสี่ยงและขนาดไม้</span>
+      <span class="rrval" id="sizeval">—</span>
+    </div>
+  </div>
+
+  <div class="fields">
+    <label><span>SL วางตรงนั้นเพราะ</span><input type="text" placeholder="ใต้ Low ที่สร้าง MSS"></label>
+    <label><span>TP เล็งไปที่</span><input type="text" placeholder="Liquidity ที่ 4,451"></label>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="num">4</span><h2>Mindset</h2></div>
+  <p class="sub">ข้อที่โกงตัวเองได้ง่ายที่สุด จึงต้องถามเป็นข้อเท็จจริง ไม่ใช่ความรู้สึก</p>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">ราคายังอยู่ในโซน ไม่ได้วิ่งพ้นไปแล้ว</span>
+    <span class="desc">ถ้าต้องเข้าไกลกว่าที่วางแผนไว้ นั่นคือการไล่ราคา ไม่ใช่การปรับแผน</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">ไม้ก่อนหน้าไม่ได้เพิ่งขาดทุน</span>
+    <span class="desc">ถ้าเพิ่งเสีย ต้องเว้นระยะตามที่ตั้งไว้ก่อน ไม่เข้าต่อทันที</span></span></label>
+
+  <label class="item"><input type="checkbox" class="req"><span class="box"></span><span class="body">
+    <span class="title">ถ้าไม้นี้ไม่เกิด ปิดจอได้เลยโดยไม่ค้างคาใจ</span>
+    <span class="desc">ถ้าคำตอบคือไม่ได้ แปลว่ากำลังต้องการไม้นี้ ไม่ใช่เลือกไม้นี้</span></span></label>
+
+  <div class="fields">
+    <label><span>ต้องเว้นหลังขาดทุน (นาที)</span><input type="text" placeholder="30"></label>
+    <label><span>ไม้ที่เท่าไหร่ของวันนี้</span><input type="text" placeholder="1"></label>
+  </div>
+</section>
+
+<section>
+  <div class="head"><span class="num">✕</span><h2>ถ้ายังไม่ครบ</h2></div>
+  <p class="sub">หนึ่งข้อที่ยังไม่ยืนยัน ก็พอแล้วที่จะไม่เข้า</p>
+
+  <div class="wait">
+    <h3>เขียนออกมาให้ชัด ก่อนจะเถียงกับตัวเอง</h3>
+    <p>การไม่เข้าเป็นการตัดสินใจอย่างหนึ่ง ไม่ใช่การพลาดโอกาส</p>
+    <label><span>ตอนนี้ยืนยันไปถึงขั้นไหน</span><textarea placeholder="เช่น Sweep แล้ว แต่ยังไม่เห็น Displacement"></textarea></label>
+    <label><span>กำลังรอหลักฐานอะไรต่อ</span><textarea placeholder="เช่น รอ H1 ปิดเหนือ..."></textarea></label>
+    <label><span>ถ้าไม่เกิดสิ่งนั้นภายในเวลาเท่าไหร่ จะยกเลิกแผนนี้</span><input type="text" placeholder="2 แท่ง H1 / ก่อน 20:30"></label>
+  </div>
+</section>
+
+<section style="border-bottom:none">
+  <div class="head"><span class="num">↺</span><h2>หลังจบไม้</h2></div>
+  <p class="sub">บันทึกทันที อย่ารอให้ความรู้สึกจางก่อน</p>
+
+  <div class="fields" style="margin-left:0">
+    <label><span>ไม้นี้ครบลิสต์ไหม</span><input type="text" placeholder="ครบ / ข้ามข้อ..."></label>
+    <label><span>ผลลัพธ์</span><input type="text" id="outcome" placeholder="+3R / −1R"></label>
+    <label><span>เข้า–ออก เวลา</span><input type="text" placeholder="15:20 – 18:05"></label>
+    <label><span>เซฟภาพชาร์ตตอนตัดสินใจแล้ว</span><input type="text" placeholder="แล้ว / ยัง"></label>
+  </div>
+
+  <div class="rr">
+    <div class="rrout" style="margin-top:0;padding-top:0;border-top:none">
+      <span id="closemsg">ปิดไม้แล้วกดปุ่มด้านล่าง ระบบจะบวกลบ Balance และ Equity ให้</span>
+      <span class="rrval" id="closeval">—</span>
+    </div>
+    <div class="btns" style="margin-top:16px">
+      <button class="btn primary" id="win" type="button">ชนะตามเป้า</button>
+      <button class="btn" id="lose" type="button">แพ้ตาม SL</button>
+      <button class="btn" id="be" type="button">ปิดที่เท่าทุน</button>
+    </div>
+    <div class="row" style="margin-top:16px">
+      <label style="flex:1 1 150px"><span>ค่าธรรมเนียมไม้นี้</span><input type="number" step="any" id="fee" placeholder="7.50"></label>
+      <label style="flex:1 1 150px"><span>หรือกรอกจำนวนเงินเอง</span><input type="number" step="any" id="manual" placeholder="-42.50"></label>
+      <label style="flex:1 1 150px;justify-content:flex-end">
+        <span>&nbsp;</span>
+        <button class="btn" id="applyManual" type="button" style="flex:none">บันทึกจำนวนนี้</button>
+      </label>
+    </div>
+    <div class="memnote" style="margin-left:0">
+      <span id="undonote">ยังไม่ได้บันทึกผลไม้นี้</span>
+      <button class="linkbtn" id="undo" type="button" hidden>ย้อนกลับ</button>
+    </div>
+  </div>
+  <div style="margin-top:18px">
+    <label style="display:block;margin-bottom:14px"><span style="display:block;font-size:15.5px;color:#C3CBCD;margin-bottom:8px;line-height:1.6">ทำถูกในเชิงกระบวนการ ไม่ว่าผลจะเป็นอย่างไร</span><textarea></textarea></label>
+    <label style="display:block"><span style="display:block;font-size:15.5px;color:#C3CBCD;margin-bottom:8px;line-height:1.6">จะแก้อะไรในไม้หน้า</span><textarea></textarea></label>
+  </div>
+  <div class="aside" style="margin-left:0;margin-top:20px">
+    เก็บสถิติแยกระหว่างไม้ที่ <b>ครบลิสต์</b> กับไม้ที่ <b>ข้ามข้อ</b><br>
+    อีกสองสามเดือนจะรู้เองว่าลิสต์นี้ช่วยจริงไหม และข้อไหนควรปรับหรือตัดทิ้ง
+  </div>
+</section>
+
+<section style="border-bottom:none;padding-top:8px">
+  <div class="head"><span class="num">↗</span><h2>การเติบโตของพอร์ต</h2></div>
+  <p class="sub">สะสมจากไม้ที่กดบันทึกผลไว้ในเครื่องนี้ หักค่าธรรมเนียมแล้ว</p>
+
+  <div class="rr" style="margin-left:0;margin-top:0">
+    <div class="row">
+      <label style="flex:1 1 150px"><span>จำนวนเงินฝากหรือถอน</span><input type="number" step="any" id="cash" placeholder="500"></label>
+      <label style="flex:1 1 150px"><span>บันทึกว่า</span>
+        <span class="btns" style="margin-top:4px">
+          <button class="btn" id="dep" type="button">ฝากเข้า</button>
+          <button class="btn" id="wdr" type="button">ถอนออก</button>
+        </span>
+      </label>
+    </div>
+    <div class="rrout">
+      <span id="cashmsg">การฝากถอนจะปรับ Balance ให้ แต่ไม่ถูกนับเป็นกำไรหรือขาดทุนจากการเทรด</span>
+      <span class="rrval" id="cashval">—</span>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="curve">
+    <svg id="curve" viewBox="0 0 300 100" preserveAspectRatio="none" aria-label="เส้นการเติบโตของพอร์ต"></svg>
+    <div class="cap" id="curvecap">ยังไม่มีไม้ที่บันทึกผลไว้</div>
+  </div>
+
+  <div class="split" id="split"></div>
+
+  <div class="btns" style="margin-top:18px">
+    <button class="btn" id="csv" type="button">ส่งออกประวัติเป็น CSV</button>
+    <button class="btn" id="wipe" type="button">ล้างประวัติทั้งหมด</button>
+  </div>
+</section>
+
+<div class="tools">
+  <h3>เก็บบันทึกไม้นี้</h3>
+  <p>หน้านี้ไม่ได้จำอะไรเองเมื่อปิดไป ถ้าจะเก็บไว้ ต้องกดบันทึกลงเครื่องก่อน แล้ววันหลังค่อยเปิดไฟล์เดิมกลับมาแก้ต่อได้</p>
+  <div class="btns">
+    <button class="btn primary" id="save">บันทึกลงเครื่อง</button>
+    <button class="btn" id="load">เปิดไฟล์เดิม</button>
+    <button class="btn" id="copy">คัดลอกเป็นข้อความ</button>
+  </div>
+  <input type="file" id="picker" accept=".json,application/json" style="display:none">
+</div>
+
+<footer>
+  <p class="q">คำถามก่อนตัดสินใจ: <b>ตอนนี้ยืนยันถึงขั้นไหน และกำลังรอหลักฐานอะไรต่อ?</b></p>
+  <p>ครบเช็กลิสต์หมายถึงผ่านเกณฑ์พิจารณา ไม่ใช่การรับประกันผล</p>
+  <p>เอกสารนี้เป็นระบบวินัยส่วนตัวสำหรับเตือนสติ ไม่ใช่คำแนะนำการลงทุน การตัดสินใจและความเสี่ยงทั้งหมดเป็นของผู้เทรดเอง</p>
+</footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="bar">
+  <div class="wrap">
+    <div class="track">
+      <div class="state" id="state">WAIT</div>
+      <div class="count" id="count">ยืนยันแล้ว 0 จาก 18</div>
+      <div class="gauge"><div class="fill" id="fill"></div></div>
+    </div>
+    <button class="reset" id="reset">เริ่มใหม่</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var boxes = document.querySelectorAll('.req');
+  var total = boxes.length;
+  var state = document.getElementById('state');
+  var count = document.getElementById('count');
+  var fill  = document.getElementById('fill');
+
+  function update(){
+    var n = 0;
+    boxes.forEach(function(b){ if(b.checked) n++; });
+    var done = n === total;
+    fill.style.width = (n/total*100) + '%';
+    count.textContent = 'ยืนยันแล้ว ' + n + ' จาก ' + total;
+    state.textContent = done ? 'ผ่านเกณฑ์พิจารณา' : 'WAIT';
+    state.classList.toggle('ok', done);
+    fill.classList.toggle('ok', done);
+  }
+  boxes.forEach(function(b){ b.addEventListener('change', update); });
+
+  document.getElementById('reset').addEventListener('click', function(){
+    if(!confirm('ล้างทุกช่องในหน้านี้ ข้อมูลที่ยังไม่ได้บันทึกลงเครื่องจะหาย')) return;
+    boxes.forEach(function(b){ b.checked = false; });
+    document.querySelectorAll('input[type=text],input[type=number],textarea')
+      .forEach(function(f){ f.value=''; });
+    if(memLive) memLoad();
+    calc(); account(); update();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  var e=document.getElementById('e'), s=document.getElementById('s'), t=document.getElementById('t');
+  var val=document.getElementById('rrval'), msg=document.getElementById('rrmsg');
+
+  function calc(){
+    var E=parseFloat(e.value), S=parseFloat(s.value), T=parseFloat(t.value);
+    val.className='rrval';
+    if(isNaN(E)||isNaN(S)||isNaN(T)){
+      val.textContent='—'; msg.textContent='กรอกสามช่องเพื่อคำนวณ'; return;
+    }
+    var risk=Math.abs(E-S), reward=Math.abs(T-E);
+    if(risk===0){ val.textContent='—'; msg.textContent='SL ห่างจาก Entry เท่ากับศูนย์'; return; }
+    if((T-E)*(E-S) <= 0){
+      val.textContent='—'; msg.textContent='ทิศทางของ TP กับ SL ไม่สอดคล้องกัน'; return;
+    }
+    var rr=reward/risk;
+    val.textContent='1 : ' + rr.toFixed(2);
+    if(rr>=3){ val.classList.add('pass'); msg.textContent='ผ่านเกณฑ์ RR'; }
+    else{ val.classList.add('fail'); msg.textContent='ต่ำกว่า 1:3 — ไม่ต้องขยับเป้า ให้ข้ามไม้นี้'; }
+  }
+  /* ---------- account state & position sizing ---------- */
+  var bal=document.getElementById('bal'), eq=document.getElementById('eq'),
+      cur=document.getElementById('cur'), cap=document.getElementById('cap'),
+      risk=document.getElementById('risk'), cs=document.getElementById('cs');
+  var accval=document.getElementById('accval'), accmsg=document.getElementById('accmsg');
+  var sizeval=document.getElementById('sizeval'), sizemsg=document.getElementById('sizemsg');
+
+  function unit(){ return (cur.value.trim() || 'USD'); }
+  function money(n){
+    return n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})+' '+unit();
+  }
+
+  function account(){
+    var B=parseFloat(bal.value), E=parseFloat(eq.value), C=parseFloat(cap.value);
+    accval.className='rrval';
+    var notes=[];
+    if(isNaN(B)){
+      accval.textContent='—';
+      accmsg.textContent='กรอก Balance และ Equity เพื่อดูต้นทุนที่ค้างอยู่';
+      return;
+    }
+    if(!isNaN(C) && C>0) notes.push('เพดานขาดทุนวันนี้ '+money(B*C/100));
+    if(isNaN(E)){
+      accval.textContent='—';
+      notes.unshift('กรอก Equity เพื่อดูกำไรขาดทุนที่ยังลอยอยู่');
+    }else{
+      var f=E-B, pct=B!==0 ? (f/B*100) : 0;
+      accval.textContent=(f>0?'+':'')+money(f);
+      if(f<0){
+        accval.classList.add('fail');
+        notes.unshift('ยังลอยลบอยู่ '+Math.abs(pct).toFixed(2)+'% ของพอร์ต — นับรวมก่อนเปิดไม้ใหม่');
+      }else if(f>0){
+        accval.classList.add('pass');
+        notes.unshift('กำไรที่ยังไม่ปิด '+pct.toFixed(2)+'% ของพอร์ต');
+      }else{
+        notes.unshift('ไม่มีไม้ลอยอยู่ Equity เท่ากับ Balance');
+      }
+    }
+    accmsg.innerHTML=notes.join('<br>');
+    sizing();
+  }
+
+  var modeEl=document.getElementById('mode'), lot=document.getElementById('lot'),
+      lstep=document.getElementById('lstep'), hint=document.getElementById('synchint');
+
+  function slDist(){
+    var E=parseFloat(e.value), S=parseFloat(s.value);
+    return (isNaN(E)||isNaN(S))? NaN : Math.abs(E-S);
+  }
+  function contract(){ var c=parseFloat(cs.value); return (c>0)? c : 100; }
+  function lotStep(){ var v=parseFloat(lstep.value); return (v>0)? v : 0.01; }
+
+  /* one source of truth: whatever lot is in the box is what this trade risks */
+  function sizeFor(B){
+    var out={ lot:NaN, amt:NaN, pct:NaN };
+    var L=parseFloat(lot.value), dist=slDist();
+    if(!isNaN(L) && L>0){
+      out.lot=L;
+      if(dist>0){
+        out.amt=L*dist*contract();
+        if(B>0) out.pct=out.amt/B*100;
+      }
+      return out;
+    }
+    var R=parseFloat(risk.value);
+    if(!isNaN(R) && R>0 && B>0){ out.amt=B*R/100; out.pct=R; }
+    return out;
+  }
+
+  /* filling either box fills the other */
+  function fromPct(){
+    modeEl.value='pct';
+    var B=parseFloat(bal.value), R=parseFloat(risk.value), dist=slDist();
+    if(isNaN(B)||isNaN(R)||R<=0||isNaN(dist)||dist<=0){ sizing(); return; }
+    var raw=(B*R/100)/(dist*contract());
+    var st=lotStep();
+    var L=+(Math.floor(raw/st)*st).toFixed(4);
+    lot.value = L>0 ? L : '';
+    sizing(raw);
+  }
+  function fromLot(){
+    modeEl.value='lot';
+    var B=parseFloat(bal.value), L=parseFloat(lot.value), dist=slDist();
+    if(isNaN(B)||B<=0||isNaN(L)||L<=0||isNaN(dist)||dist<=0){ sizing(); return; }
+    risk.value=+((L*dist*contract())/B*100).toFixed(2);
+    sizing();
+  }
+  function resync(){ if(modeEl.value==='lot') fromLot(); else fromPct(); }
+
+  function sizing(raw){
+    var B=parseFloat(bal.value);
+    var z=sizeFor(B), dist=slDist();
+    sizeval.className='rrval';
+
+    if(isNaN(z.amt)){
+      sizeval.textContent='—';
+      sizemsg.textContent='กรอก Balance, Entry, SL แล้วใส่ % หรือล็อตช่องใดช่องหนึ่ง';
+      hint.textContent='กรอกช่องไหนก็ได้ อีกช่องจะคำนวณให้เอง';
+      return;
+    }
+
+    sizeval.textContent=money(z.amt);
+
+    if(isNaN(dist)||dist<=0){
+      sizemsg.textContent='นี่คือเงินที่ตั้งใจจะเสี่ยง กรอก Entry และ SL เพื่อแปลงเป็นขนาดล็อต';
+      return;
+    }
+
+    var lines=['ถ้าโดน SL จะเสียประมาณ '+money(z.amt)+
+               (isNaN(z.pct)?'':' หรือ '+z.pct.toFixed(2)+'% ของพอร์ต')];
+
+    var capPct=parseFloat(cap.value);
+    var over=false;
+    if(!isNaN(z.pct)){
+      if(z.pct>2){ over=true; lines.push('เกิน 2% ต่อไม้ ถือว่าหนักสำหรับไม้เดียว'); }
+      else if(!isNaN(capPct)&&capPct>0&&z.pct>capPct){
+        over=true; lines.push('ไม้เดียวกินเกินเพดานขาดทุนทั้งวัน '+capPct+'%');
+      }
+    }
+    sizeval.classList.add(over?'fail':'pass');
+
+    if(modeEl.value==='pct'){
+      if(!(parseFloat(lot.value)>0)){
+        sizeval.className='rrval fail';
+        lines.push('ล็อตที่ได้เล็กกว่าสเต็ปขั้นต่ำ '+lotStep()+
+                   ' ส่งคำสั่งตามแผนนี้ไม่ได้ ถ้าฝืนเข้าจะเสี่ยงเกินที่ตั้งไว้');
+      }else if(raw!==undefined && Math.abs(raw-parseFloat(lot.value))>1e-9){
+        lines.push('ปัดลงจาก '+raw.toFixed(3)+' ล็อต เพื่อไม่ให้เสี่ยงเกิน');
+      }
+    }
+    lines.push('ยืนยันขนาดสัญญากับโบรกก่อนส่งคำสั่ง');
+    sizemsg.innerHTML=lines.join('<br>');
+    hint.textContent='แก้ช่องไหน อีกช่องจะขยับตาม ตอนนี้ยึดตาม'+
+      (modeEl.value==='lot'?'ล็อตที่กรอกไว้':'เปอร์เซ็นต์ที่ตั้งไว้');
+  }
+
+  risk.addEventListener('input', fromPct);
+  lot.addEventListener('input', fromLot);
+  [cs,lstep].forEach(function(f){ f.addEventListener('input', resync); });
+
+  [bal,eq,cur,cap].forEach(function(f){ f.addEventListener('input', account); });
+  bal.addEventListener('input', resync);
+  [e,s,t].forEach(function(f){ f.addEventListener('input', function(){ calc(); resync(); }); });
+  /* ---------- remember account settings between visits ---------- */
+  var MEM='satang-account-v1';
+  var start=document.getElementById('start'), fee=document.getElementById('fee');
+  var memPairs=[['bal',bal],['eq',eq],['cur',cur],['cap',cap],['risk',risk],['cs',cs],['start',start],['fee',fee],['mode',modeEl],['lot',lot],['lstep',lstep]];
+  var memText=document.getElementById('memtext'),
+      memNote=document.getElementById('memnote'),
+      memClear=document.getElementById('memclear');
+  var memTimer, memLive=false;
+
+  function stampText(iso){
+    if(!iso) return '';
+    var d=new Date(iso);
+    if(isNaN(d)) return '';
+    function two(n){ return (n<10?'0':'')+n; }
+    return two(d.getDate())+'/'+two(d.getMonth()+1)+' '+two(d.getHours())+':'+two(d.getMinutes());
+  }
+
+  function memSay(msg, warn){
+    memText.textContent=msg;
+    memNote.classList.toggle('warn', !!warn);
+    memClear.hidden=!memLive;
+  }
+
+  function keyWrite(key, txt){
+    var ok=false;
+    try{ localStorage.setItem(key, txt); ok=true; }catch(err){}
+    if(window.storage && window.storage.set){
+      try{ Promise.resolve(window.storage.set(key, txt, false)).catch(function(){}); ok=true; }
+      catch(err){}
+    }
+    return ok;
+  }
+  function keyRead(key, cb){
+    function local(){
+      try{ cb(localStorage.getItem(key)); }catch(err){ cb(null); }
+    }
+    if(window.storage && window.storage.get){
+      try{
+        Promise.resolve(window.storage.get(key, false)).then(function(r){
+          if(r && r.value) cb(r.value); else local();
+        }, local);
+        return;
+      }catch(err){}
+    }
+    local();
+  }
+  function keyDrop(key){
+    try{ localStorage.removeItem(key); }catch(err){}
+    if(window.storage && window.storage.delete){
+      try{ Promise.resolve(window.storage.delete(key, false)).catch(function(){}); }catch(err){}
+    }
+  }
+
+  function memWrite(){
+    var payload={saved:new Date().toISOString()};
+    memPairs.forEach(function(p){ payload[p[0]]=p[1].value; });
+    var txt=JSON.stringify(payload), ok=false;
+
+    try{ localStorage.setItem(MEM, txt); ok=true; }catch(err){}
+
+    if(window.storage && window.storage.set){
+      try{
+        Promise.resolve(window.storage.set(MEM, txt, false)).catch(function(){});
+        ok=true;
+      }catch(err){}
+    }
+
+    memLive=ok;
+    if(ok) memSay('จำค่าบัญชีไว้แล้ว อัปเดตล่าสุด '+stampText(payload.saved), false);
+    else memSay('เบราว์เซอร์นี้ไม่ยอมให้จำค่า ใช้ปุ่มบันทึกลงเครื่องด้านล่างแทน', true);
+  }
+
+  function memQueue(){ clearTimeout(memTimer); memTimer=setTimeout(memWrite, 500); }
+
+  function memApply(raw){
+    var o;
+    try{ o=JSON.parse(raw); }catch(err){ return false; }
+    if(!o) return false;
+    memPairs.forEach(function(p){
+      if(typeof o[p[0]]==='string' && o[p[0]]!=='') p[1].value=o[p[0]];
+    });
+    memLive=true;
+    account(); resync();
+    memSay('เปิดค่าบัญชีที่จำไว้ อัปเดตล่าสุด '+stampText(o.saved), false);
+    return true;
+  }
+
+  function memFromLocal(){
+    try{
+      var v=localStorage.getItem(MEM);
+      if(v && memApply(v)) return;
+      localStorage.setItem(MEM+':probe','1');
+      localStorage.removeItem(MEM+':probe');
+      memLive=true;
+      memSay('ค่าบัญชีจะถูกจำไว้ให้ในเครื่องนี้', false);
+    }catch(err){
+      memLive=false;
+      memSay('เบราว์เซอร์นี้ไม่ยอมให้จำค่า ใช้ปุ่มบันทึกลงเครื่องด้านล่างแทน', true);
+    }
+  }
+
+  function memLoad(){
+    if(window.storage && window.storage.get){
+      try{
+        Promise.resolve(window.storage.get(MEM, false)).then(function(r){
+          if(r && r.value && memApply(r.value)) return;
+          memFromLocal();
+        }, memFromLocal);
+        return;
+      }catch(err){}
+    }
+    memFromLocal();
+  }
+
+  function memForget(){
+    try{ localStorage.removeItem(MEM); }catch(err){}
+    if(window.storage && window.storage.delete){
+      try{ Promise.resolve(window.storage.delete(MEM, false)).catch(function(){}); }catch(err){}
+    }
+    memPairs.forEach(function(p){ p[1].value=''; });
+    memLive=false;
+    account(); resync();
+    memSay('ลืมค่าที่จำไว้แล้ว', false);
+    say('ล้างค่าบัญชีที่จำไว้เรียบร้อย');
+  }
+
+  memPairs.forEach(function(p){ p[1].addEventListener('input', memQueue); });
+  memClear.addEventListener('click', memForget);
+
+  /* ---------- settle the trade into the account ---------- */
+  var outcome=document.getElementById('outcome'), manual=document.getElementById('manual'),
+      closemsg=document.getElementById('closemsg'), closeval=document.getElementById('closeval'),
+      undoBtn=document.getElementById('undo'), undoNote=document.getElementById('undonote');
+  var lastDelta=null, lastOutcome='';
+
+  function riskAmount(){
+    var z=sizeFor(parseFloat(bal.value));
+    return (!isNaN(z.amt) && z.amt>0)? z.amt : NaN;
+  }
+  function rrRatio(){
+    var E=parseFloat(e.value), S=parseFloat(s.value), T=parseFloat(t.value);
+    if(isNaN(E)||isNaN(S)||isNaN(T)) return NaN;
+    if(Math.abs(E-S)===0 || (T-E)*(E-S)<=0) return NaN;
+    return Math.abs(T-E)/Math.abs(E-S);
+  }
+
+  function settle(gross, label){
+    if(isNaN(gross)){ say('กรอกจำนวนเงินก่อน'); return; }
+    var B=parseFloat(bal.value);
+    if(isNaN(B)){ say('กรอก Balance ก่อน ระบบจะได้บวกลบให้ถูก'); return; }
+    var E=parseFloat(eq.value);
+    var cost=Math.abs(parseFloat(fee.value)) || 0;
+    var delta=+(gross-cost).toFixed(2);
+
+    /* risk must be measured against the balance at entry, before this trade settles */
+    var z=sizeFor(B);
+    var R=(!isNaN(z.amt) && z.amt>0) ? z.amt : NaN;
+
+    bal.value=(B+delta).toFixed(2);
+    if(!isNaN(E)) eq.value=(E+delta).toFixed(2);
+
+    lastDelta={ delta:delta, bal:B, eq:isNaN(E)?null:E, outcome:outcome.value };
+
+    closeval.className='rrval '+(delta>0?'pass':(delta<0?'fail':''));
+    closeval.textContent=(delta>0?'+':'')+money(delta);
+    closemsg.innerHTML=label+
+      (cost?('<br>หักค่าธรรมเนียม '+money(cost)+' จากผลดิบ '+money(gross)):'')+
+      (!isNaN(R)?('<br>1R ของไม้นี้คือ '+money(R)+' คิดจาก Balance ตอนเข้า '+money(B)):'')+
+      '<br>Balance ใหม่ '+money(parseFloat(bal.value));
+
+    var inR=(!isNaN(R)&&R>0)?((delta>=0?'+':'')+(delta/R).toFixed(2)+'R  '):'';
+    outcome.value=inR+(delta>0?'+':'')+money(delta);
+
+    var m=meta(), passed=checks.filter(function(c){ return c.checked; }).length;
+    log.push({ t:new Date().toISOString(), sym:m.sym||'', tf:m.tf||'',
+               gross:+gross.toFixed(2), fee:cost, delta:delta, label:label,
+               risk:isNaN(R)?'':+R.toFixed(2),
+               r:(!isNaN(R)&&R>0)? +(delta/R).toFixed(2) : '',
+               n:passed, N:checks.length, bal:+(B+delta).toFixed(2) });
+    logWrite(); render();
+
+    undoBtn.hidden=false;
+    undoNote.textContent='บันทึกผลแล้ว '+label;
+    account(); resync(); memWrite();
+    say('อัปเดตบัญชีแล้ว '+(delta>0?'+':'')+money(delta));
+  }
+
+  document.getElementById('win').addEventListener('click', function(){
+    var R=riskAmount(), rr=rrRatio();
+    if(isNaN(R)){ say('ยังคำนวณความเสี่ยงไม่ได้ ตรวจช่องขนาดไม้กับ Entry/SL ก่อน'); return; }
+    if(isNaN(rr)){ say('กรอก Entry, SL และ TP ก่อน ระบบจะได้รู้ว่าเป้ากี่ R'); return; }
+    settle(+(R*rr).toFixed(2), 'ชนะตามเป้า '+rr.toFixed(2)+'R');
+  });
+
+  document.getElementById('lose').addEventListener('click', function(){
+    var R=riskAmount();
+    if(isNaN(R)){ say('ยังคำนวณความเสี่ยงไม่ได้ ตรวจช่องขนาดไม้กับ Entry/SL ก่อน'); return; }
+    settle(-(+R.toFixed(2)), 'แพ้ตาม SL เต็มความเสี่ยง');
+  });
+
+  document.getElementById('be').addEventListener('click', function(){
+    settle(0, 'ปิดที่เท่าทุน');
+  });
+
+  document.getElementById('applyManual').addEventListener('click', function(){
+    var v=parseFloat(manual.value);
+    if(isNaN(v)){ say('กรอกจำนวนเงินก่อน ใส่เครื่องหมายลบถ้าขาดทุน'); return; }
+    settle(+v.toFixed(2), 'บันทึกเอง');
+  });
+
+  undoBtn.addEventListener('click', function(){
+    if(!lastDelta) return;
+    bal.value=lastDelta.bal.toFixed(2);
+    if(lastDelta.eq!==null) eq.value=lastDelta.eq.toFixed(2);
+    outcome.value=lastDelta.outcome;
+    closeval.className='rrval'; closeval.textContent='—';
+    closemsg.textContent='ย้อนกลับแล้ว Balance กลับไปเป็น '+money(lastDelta.bal);
+    undoBtn.hidden=true;
+    undoNote.textContent='ยังไม่ได้บันทึกผลไม้นี้';
+    lastDelta=null;
+    log.pop(); logWrite(); render();
+    account(); resync(); memWrite();
+    say('ย้อนกลับเรียบร้อย ลบไม้ล่าสุดออกจากประวัติแล้ว');
+  });
+
+  /* ---------- portfolio growth ---------- */
+  var LOG='satang-log-v1';
+  var log=[];
+  var statsEl=document.getElementById('stats'),
+      curveEl=document.getElementById('curve'),
+      curveCap=document.getElementById('curvecap'),
+      splitEl=document.getElementById('split');
+
+  function logWrite(){ keyWrite(LOG, JSON.stringify(log)); }
+  function logLoad(){
+    keyRead(LOG, function(raw){
+      if(raw){ try{ var a=JSON.parse(raw); if(a && a.length!==undefined) log=a; }catch(err){} }
+      render();
+    });
+  }
+
+  var cashIn=document.getElementById('cash'),
+      cashMsg=document.getElementById('cashmsg'),
+      cashVal=document.getElementById('cashval');
+
+  function moveCash(sign){
+    var v=Math.abs(parseFloat(cashIn.value));
+    if(isNaN(v)||v===0){ say('กรอกจำนวนเงินก่อน'); return; }
+    var B=parseFloat(bal.value);
+    if(isNaN(B)){ say('กรอก Balance ก่อน'); return; }
+    var E=parseFloat(eq.value);
+    var amt=sign*v;
+
+    bal.value=(B+amt).toFixed(2);
+    if(!isNaN(E)) eq.value=(E+amt).toFixed(2);
+
+    lastDelta={ delta:amt, bal:B, eq:isNaN(E)?null:E, outcome:outcome.value };
+    log.push({ type:'cash', t:new Date().toISOString(), amount:amt,
+               label:(sign>0?'ฝากเข้า':'ถอนออก'), bal:+(B+amt).toFixed(2) });
+    logWrite(); render();
+
+    cashVal.className='rrval '+(sign>0?'pass':'fail');
+    cashVal.textContent=(sign>0?'+':'')+money(amt);
+    cashMsg.innerHTML=(sign>0?'ฝากเข้า':'ถอนออก')+' '+money(v)+
+      '<br>Balance ใหม่ '+money(parseFloat(bal.value))+' — ไม่นับเป็นผลการเทรด';
+    cashIn.value='';
+
+    undoBtn.hidden=false;
+    undoNote.textContent='บันทึกล่าสุด '+(sign>0?'ฝากเข้า':'ถอนออก')+' '+money(v);
+    account(); resync(); memWrite();
+    say((sign>0?'ฝากเข้า ':'ถอนออก ')+money(v)+' แล้ว');
+  }
+  document.getElementById('dep').addEventListener('click', function(){ moveCash(1); });
+  document.getElementById('wdr').addEventListener('click', function(){ moveCash(-1); });
+
+  function isCash(x){ return x && x.type==='cash'; }
+  function trades(){ return log.filter(function(x){ return !isCash(x); }); }
+
+  function baseCapital(){
+    var st=parseFloat(start.value);
+    if(!isNaN(st) && st>0) return st;
+    if(log.length){
+      var moved=log.reduce(function(a,x){
+        return a + (isCash(x)? x.amount : x.delta);
+      },0);
+      return log[log.length-1].bal - moved;
+    }
+    return NaN;
+  }
+
+  function stat(k,v,cls){
+    return '<div class="stat"><div class="k">'+k+'</div><div class="v'+
+      (cls?' '+cls:'')+'">'+v+'</div></div>';
+  }
+
+  function render(){
+    var tr=trades(), n=tr.length;
+    var flows=log.filter(isCash);
+    var moved=flows.reduce(function(a,x){ return a+x.amount; },0);
+    if(!n && !flows.length){
+      statsEl.innerHTML=stat('ไม้ที่บันทึกไว้','0')+
+        stat('กำไรสะสมสุทธิ','—')+stat('เติบโตจากทุนตั้งต้น','—');
+      curveEl.innerHTML='';
+      curveCap.textContent='ยังไม่มีไม้ที่บันทึกผลไว้ กดปุ่มผลลัพธ์หลังปิดไม้ แล้วเส้นจะเริ่มขึ้นที่นี่';
+      splitEl.innerHTML='เมื่อมีข้อมูลพอ ตรงนี้จะเทียบให้ว่าไม้ที่ <b>ครบลิสต์</b> กับไม้ที่ <b>ข้ามข้อ</b> ผลต่างกันจริงไหม';
+      return;
+    }
+
+    var net=0, fees=0, w=0, l=0, b=0, twr=1, twrOK=true;
+    tr.forEach(function(x){
+      net+=x.delta; fees+=(x.fee||0);
+      if(x.delta>0) w++; else if(x.delta<0) l++; else b++;
+      var before=x.bal-x.delta;
+      if(before>0) twr*=(1+x.delta/before); else twrOK=false;
+    });
+    net=+net.toFixed(2); fees=+fees.toFixed(2); moved=+moved.toFixed(2);
+    var decided=w+l;
+    var wr=decided? (w/decided*100) : 0;
+    var base=baseCapital();
+    var growth=(n&&twrOK)? (twr-1)*100 : NaN;
+    var netCls=net>0?'pass':(net<0?'fail':'');
+
+    statsEl.innerHTML=
+      stat('ไม้ที่บันทึกไว้', n+(b?(' <span style="font-size:15px;color:var(--faint)">เท่าทุน '+b+'</span>'):''))+
+      stat('ชนะ / แพ้', w+' / '+l)+
+      stat('อัตราชนะ', decided? wr.toFixed(0)+'%':'—')+
+      stat('กำไรสะสมสุทธิ', (net>0?'+':'')+money(net), netCls)+
+      stat('ค่าธรรมเนียมรวม', fees? '-'+money(fees):money(0))+
+      stat('ฝากถอนสุทธิ', moved? ((moved>0?'+':'')+money(moved)) : money(0))+
+      stat('ผลตอบแทนสะสม', isNaN(growth)?'—':((growth>0?'+':'')+growth.toFixed(2)+'%'),
+           isNaN(growth)?'':(growth>0?'pass':(growth<0?'fail':'')));
+
+    /* equity curve */
+    var pts=[], run=isNaN(base)? 0 : base;
+    pts.push(run);
+    log.forEach(function(x){
+      run += isCash(x)? x.amount : x.delta;
+      pts.push(+run.toFixed(2));
+    });
+    var lo=Math.min.apply(null,pts), hi=Math.max.apply(null,pts);
+    var pad=(hi-lo)||Math.max(Math.abs(hi)*0.02,1);
+    lo-=pad*0.15; hi+=pad*0.15;
+    var W=300, H=100;
+    var xy=pts.map(function(v,i){
+      var x=(pts.length>1)? (i/(pts.length-1))*W : 0;
+      var y=H-((v-lo)/(hi-lo))*H;
+      return x.toFixed(2)+','+y.toFixed(2);
+    });
+    var baseY=(!isNaN(base))? (H-((base-lo)/(hi-lo))*H) : null;
+    var col=net>0?'var(--sage)':(net<0?'var(--ember)':'var(--gold)');
+    var svg='';
+    if(baseY!==null){
+      svg+='<line x1="0" y1="'+baseY.toFixed(2)+'" x2="'+W+'" y2="'+baseY.toFixed(2)+
+           '" stroke="var(--rule)" stroke-width="1" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>';
+    }
+    svg+='<polyline points="'+xy.join(' ')+'" fill="none" stroke="'+col+
+         '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+    curveEl.innerHTML=svg;
+    curveCap.innerHTML=(isNaN(base)
+      ? 'กรอกทุนตั้งต้นเพื่อให้เส้นอ้างอิงถูกต้อง ตอนนี้แสดงเฉพาะผลสะสม'
+      : 'เส้นประคือทุนตั้งต้น '+money(base)+'   ล่าสุด '+money(pts[pts.length-1]))+
+      (flows.length? '<br>เส้นนี้คือ Balance จริง จึงมีขั้นกระโดดจากการฝากถอน '+flows.length+
+       ' ครั้ง ส่วนผลตอบแทนสะสมด้านบนตัดผลนั้นออกแล้ว':'');
+
+    /* full checklist versus skipped */
+    var full=tr.filter(function(x){ return x.N && x.n===x.N; });
+    var part=tr.filter(function(x){ return !(x.N && x.n===x.N); });
+    function line(name, arr){
+      if(!arr.length) return name+' ยังไม่มีข้อมูล';
+      var sum=arr.reduce(function(a,x){ return a+x.delta; },0);
+      var dw=arr.filter(function(x){ return x.delta>0; }).length;
+      var dl=arr.filter(function(x){ return x.delta<0; }).length;
+      var rate=(dw+dl)? Math.round(dw/(dw+dl)*100)+'%' : '—';
+      return name+' '+arr.length+' ไม้   ชนะ '+rate+'   รวม <b>'+
+        (sum>0?'+':'')+money(+sum.toFixed(2))+'</b>';
+    }
+    splitEl.innerHTML=line('ครบลิสต์',full)+'<br>'+line('ข้ามข้อ',part)+
+      (n<20? '<br><span style="color:var(--faint)">ยังน้อยเกินกว่าจะสรุปอะไรได้ ตัวเลขนี้เริ่มมีความหมายราว 30 ไม้ขึ้นไป</span>':'');
+  }
+
+  start.addEventListener('input', render);
+
+  document.getElementById('csv').addEventListener('click', function(){
+    if(!log.length){ say('ยังไม่มีประวัติให้ส่งออก'); return; }
+    
+    var rows=[['วันเวลา','สินค้า','TF','ผลดิบ','ค่าธรรมเนียม','สุทธิ','1R','ผลเป็น R','ผลลัพธ์','ติ๊กผ่าน','จากทั้งหมด','Balance']];
+    log.forEach(function(x){
+      if(isCash(x)) rows.push([x.t,'','','','',x.amount,'','',x.label,'','',x.bal]);
+      else rows.push([x.t, x.sym, x.tf, x.gross, x.fee, x.delta,
+                      x.risk===undefined?'':x.risk, x.r===undefined?'':x.r,
+                      x.label, x.n, x.N, x.bal]);
+    });
+    var csv='\ufeff'+rows.map(function(r){
+      return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(',');
+    }).join('\r\n');
+    download('satang-history.csv', csv, 'text/csv');
+    say('ส่งออกประวัติ '+log.length+' ไม้แล้ว');
+  });
+
+  document.getElementById('wipe').addEventListener('click', function(){
+    if(!log.length){ say('ยังไม่มีประวัติ'); return; }
+    if(!confirm('ลบประวัติทั้งหมด '+log.length+' ไม้ กู้คืนไม่ได้ ส่งออก CSV ไว้ก่อนหรือยัง')) return;
+    log=[]; keyDrop(LOG); render();
+    say('ล้างประวัติแล้ว');
+  });
+
+  account();
+  memLoad();
+  logLoad();
+
+  /* ---------- save / load / copy ---------- */
+  var toast=document.getElementById('toast'), toastT;
+  function say(m){
+    toast.textContent=m; toast.classList.add('show');
+    clearTimeout(toastT);
+    toastT=setTimeout(function(){ toast.classList.remove('show'); }, 2800);
+  }
+
+  var fields=Array.prototype.slice.call(
+    document.querySelectorAll('input[type=text],input[type=number],textarea'));
+  var checks=Array.prototype.slice.call(boxes);
+
+  function meta(){
+    var m=document.querySelectorAll('.meta input');
+    return { date:(m[0]&&m[0].value.trim())||'',
+             sym:(m[1]&&m[1].value.trim())||'',
+             tf:(m[2]&&m[2].value.trim())||'' };
+  }
+
+  function snapshot(){
+    return { app:'satang-check-list', v:1, saved:new Date().toISOString(),
+             checks:checks.map(function(c){ return c.checked; }),
+             fields:fields.map(function(f){ return f.value; }) };
+  }
+
+  function apply(d){
+    if(!d || !d.checks || !d.fields) throw new Error('bad file');
+    d.checks.forEach(function(v,i){ if(checks[i]) checks[i].checked=!!v; });
+    d.fields.forEach(function(v,i){ if(fields[i]) fields[i].value=v; });
+    calc(); account(); update();
+    if(d.fields.length!==fields.length) say('ไฟล์นี้มาจากเช็คลิสต์คนละรุ่น ช่องอาจเลื่อน ตรวจอีกครั้ง');
+  }
+
+  function stamp(){
+    var m=meta();
+    var d=(m.date || new Date().toISOString().slice(0,10)).replace(/[^0-9A-Za-z.\-]/g,'');
+    var y=(m.sym || 'trade').replace(/[^0-9A-Za-z]/g,'');
+    return 'satang-'+y+'-'+d;
+  }
+
+  function download(name, text, type){
+    var b=new Blob([text], {type:type+';charset=utf-8'});
+    var u=URL.createObjectURL(b);
+    var a=document.createElement('a');
+    a.href=u; a.download=name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(u); }, 1500);
+  }
+
+  document.getElementById('save').addEventListener('click', function(){
+    download(stamp()+'.json', JSON.stringify(snapshot(), null, 2), 'application/json');
+    say('บันทึกแล้ว — ไฟล์อยู่ในที่เก็บดาวน์โหลดของเครื่อง');
+  });
+
+  document.getElementById('load').addEventListener('click', function(){
+    document.getElementById('picker').click();
+  });
+
+  document.getElementById('picker').addEventListener('change', function(ev){
+    var f = ev.target.files && ev.target.files[0];
+    if(!f) return;
+    var r=new FileReader();
+    r.onload=function(){
+      try{ apply(JSON.parse(r.result)); say('เปิดไฟล์เดิมเรียบร้อย แก้ต่อได้เลย'); }
+      catch(err){ say('เปิดไม่ได้ — ไฟล์นี้ไม่ใช่บันทึกของเช็คลิสต์'); }
+      ev.target.value='';
+    };
+    r.onerror=function(){ say('อ่านไฟล์ไม่สำเร็จ ลองเลือกใหม่อีกครั้ง'); };
+    r.readAsText(f);
+  });
+
+  function asText(){
+    var m=meta(), out=[];
+    var n=checks.filter(function(c){ return c.checked; }).length;
+    out.push('Satang Check List');
+    var head=[m.date, m.sym, m.tf].filter(Boolean).join('   ');
+    if(head) out.push(head);
+    out.push('ยืนยันแล้ว '+n+' จาก '+checks.length+'   '+
+             (n===checks.length ? 'ผ่านเกณฑ์พิจารณา' : 'WAIT'));
+
+    Array.prototype.forEach.call(document.querySelectorAll('section'), function(sec){
+      var h=sec.querySelector('h2'); if(!h) return;
+      var lines=[];
+      Array.prototype.forEach.call(sec.querySelectorAll('label'), function(l){
+        if(l.classList.contains('item')){
+          var t=l.querySelector('.title'), c=l.querySelector('input');
+          lines.push((c && c.checked ? '[x] ' : '[ ] ') + (t ? t.textContent.trim() : ''));
+        }else{
+          var cap=l.querySelector('span'), fld=l.querySelector('input,textarea');
+          if(fld && fld.value.trim()){
+            lines.push('    ' + (cap ? cap.textContent.trim() : '') + ': ' + fld.value.trim());
+          }
+        }
+      });
+      if(lines.length){ out.push(''); out.push(h.textContent.trim()); out=out.concat(lines); }
+    });
+
+    var rr=document.getElementById('rrval').textContent.trim();
+    var sz=sizeval.textContent.trim();
+    var ac=accval.textContent.trim();
+    var tail=[];
+    if(rr && rr!=='\u2014') tail.push('RR   '+rr);
+    if(sz && sz!=='\u2014') tail.push('เงินที่เสี่ยง   '+sz);
+    if(ac && ac!=='\u2014') tail.push('กำไรขาดทุนลอย   '+ac);
+    if(tail.length){ out.push(''); out=out.concat(tail); }
+    return out.join('\n');
+  }
+
+  document.getElementById('copy').addEventListener('click', function(){
+    var txt=asText();
+    function fallback(){
+      var ta=document.createElement('textarea');
+      ta.value=txt; ta.style.position='fixed'; ta.style.top='0'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try{ document.execCommand('copy'); say('คัดลอกแล้ว วางลงสมุดบันทึกได้เลย'); }
+      catch(err){ say('คัดลอกไม่ได้ ลองกดบันทึกลงเครื่องแทน'); }
+      document.body.removeChild(ta);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){
+        say('คัดลอกแล้ว วางลงสมุดบันทึกได้เลย');
+      }, fallback);
+    }else{ fallback(); }
+  });
+
+  update();
+})();
+</script>
+</body>
+</html>
