@@ -6,8 +6,8 @@
   'use strict';
 
   /* ===== 1. กรอกสองค่านี้จาก Supabase → Project Settings → API ===== */
-  const SUPABASE_URL = 'https://xxxxxxxx.supabase.co';
-  const SUPABASE_KEY = 'ncmwddsthwsclhgwptob';
+  const SUPABASE_URL = 'https://ncmwddsthwsclhgwptob.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Bp9mXa95_YEh3zHwbQ3F5Q_rDeMuGK1';
   /* ================================================================ */
 
   const P = '__sync_';                    // คีย์ภายในของตัวซิงก์เอง
