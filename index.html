@@ -83,12 +83,23 @@ h1{
 .meta label{display:flex;flex-direction:column;gap:2px;flex:1 1 120px}
 .meta span{font-size:14.5px;color:var(--faint);letter-spacing:.02em}
 
-input[type=text],input[type=number],textarea{
+input[type=text],input[type=number],textarea,select{
   background:transparent;border:none;border-bottom:1px solid var(--rule);
   color:var(--gold);font-family:"Bai Jamjuree",sans-serif;
   font-weight:500;font-size:17px;padding:6px 2px;width:100%;
   transition:border-color .18s;
 }
+select{
+  -webkit-appearance:none;appearance:none;cursor:pointer;
+  padding-right:20px;border-radius:0;
+  background-image:linear-gradient(45deg,transparent 50%,var(--faint) 50%),
+                   linear-gradient(135deg,var(--faint) 50%,transparent 50%);
+  background-position:calc(100% - 10px) 55%, calc(100% - 5px) 55%;
+  background-size:5px 5px, 5px 5px;background-repeat:no-repeat;
+}
+select option{background:var(--panel);color:var(--text)}
+select:focus{outline:none;border-bottom-color:var(--gold)}
+select:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
 input::placeholder,textarea::placeholder{color:#6B7578;font-weight:400}
 input:focus,textarea:focus{outline:none;border-bottom-color:var(--gold)}
 input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold-soft);outline-offset:3px}
@@ -307,8 +318,16 @@ footer .q b{color:var(--gold);font-weight:600}
 
   <div class="meta">
     <label><span>วันที่</span><input type="text" placeholder="10.09.2026"></label>
-    <label><span>สินค้า</span><input type="text" placeholder="XAUUSD"></label>
-    <label><span>Timeframe</span><input type="text" placeholder="H1"></label>
+    <label><span>สินค้า</span><input type="text" placeholder="XAUUSD" data-keep="sym"></label>
+    <label><span>Timeframe</span><select>
+      <option value="">—</option>
+      <option value="M5">M5</option>
+      <option value="M15">M15</option>
+      <option value="M30">M30</option>
+      <option value="H1">H1</option>
+      <option value="H4">H4</option>
+      <option value="Day">Day</option>
+    </select></label>
   </div>
 </header>
 
@@ -337,9 +356,9 @@ footer .q b{color:var(--gold);font-weight:600}
     <span class="desc">Equity ต่ำกว่า Balance แปลว่ายังลอยลบอยู่ การเปิดเพิ่มคือทบความเสี่ยงเดิม ไม่ใช่การกระจาย</span></span></label>
 
   <div class="fields">
-    <label><span>เว้นข่าว (นาที)</span><input type="text" placeholder="30"></label>
-    <label><span>แพ้ติดกันได้</span><input type="text" placeholder="2 ไม้"></label>
-    <label><span>เข้าได้สูงสุด</span><input type="text" placeholder="3 ไม้/วัน"></label>
+    <label><span>เว้นข่าว (นาที)</span><input type="text" placeholder="30" data-keep="news-gap"></label>
+    <label><span>แพ้ติดกันได้</span><input type="text" placeholder="2 ไม้" data-keep="max-loss-streak"></label>
+    <label><span>เข้าได้สูงสุด</span><input type="text" placeholder="3 ไม้/วัน" data-keep="max-trades"></label>
     <label><span>ขาดทุนสูงสุดของวัน (%)</span><input type="number" step="any" id="cap" placeholder="3"></label>
   </div>
 
@@ -379,8 +398,8 @@ footer .q b{color:var(--gold);font-weight:600}
     <span class="desc">ถ้าสวน H4/D1 ต้องรู้ตัวตั้งแต่ก่อนเข้า ไม่ใช่มารู้ตอนติดลบ</span></span></label>
 
   <div class="fields">
-    <label><span>ไบแอสวันนี้</span><input type="text" placeholder="Buy / Sell"></label>
-    <label><span>เพราะอะไร</span><input type="text" placeholder="D1 ยังทำ HH และ Liquidity อยู่ด้านบน"></label>
+    <label><span>ไบแอสวันนี้</span><input type="text" placeholder="Buy / Sell" data-keep="bias"></label>
+    <label><span>เพราะอะไร</span><input type="text" placeholder="D1 ยังทำ HH และ Liquidity อยู่ด้านบน" data-keep="bias-why"></label>
   </div>
 
   <div class="aside">
@@ -439,9 +458,9 @@ footer .q b{color:var(--gold);font-weight:600}
 
   <div class="rr">
     <div class="row">
-      <label><span>Entry</span><input type="number" step="any" id="e" placeholder="4418"></label>
-      <label><span>Stop Loss</span><input type="number" step="any" id="s" placeholder="4396"></label>
-      <label><span>Take Profit</span><input type="number" step="any" id="t" placeholder="4485"></label>
+      <label><span>Entry</span><input type="number" step="any" id="e" placeholder="4418" data-keep="entry"></label>
+      <label><span>Stop Loss</span><input type="number" step="any" id="s" placeholder="4396" data-keep="sl"></label>
+      <label><span>Take Profit</span><input type="number" step="any" id="t" placeholder="4485" data-keep="tp"></label>
     </div>
 
     <input type="hidden" id="mode" value="pct">
@@ -645,8 +664,10 @@ footer .q b{color:var(--gold);font-weight:600}
   document.getElementById('reset').addEventListener('click', function(){
     if(!confirm('ล้างทุกช่องในหน้านี้ ข้อมูลที่ยังไม่ได้บันทึกลงเครื่องจะหาย')) return;
     boxes.forEach(function(b){ b.checked = false; });
-    document.querySelectorAll('input[type=text],input[type=number],textarea')
+    document.querySelectorAll('input[type=text],input[type=number],textarea,select')
       .forEach(function(f){ f.value=''; });
+    fillToday();
+    keepFill();
     if(memLive) memLoad();
     calc(); account(); update();
     window.scrollTo({top:0, behavior:'smooth'});
@@ -1233,11 +1254,11 @@ footer .q b{color:var(--gold);font-weight:600}
   }
 
   var fields=Array.prototype.slice.call(
-    document.querySelectorAll('input[type=text],input[type=number],textarea'));
+    document.querySelectorAll('input[type=text],input[type=number],textarea,select'));
   var checks=Array.prototype.slice.call(boxes);
 
   function meta(){
-    var m=document.querySelectorAll('.meta input');
+    var m=document.querySelectorAll('.meta input,.meta select');
     return { date:(m[0]&&m[0].value.trim())||'',
              sym:(m[1]&&m[1].value.trim())||'',
              tf:(m[2]&&m[2].value.trim())||'' };
@@ -1254,6 +1275,7 @@ footer .q b{color:var(--gold);font-weight:600}
     d.checks.forEach(function(v,i){ if(checks[i]) checks[i].checked=!!v; });
     d.fields.forEach(function(v,i){ if(fields[i]) fields[i].value=v; });
     calc(); account(); update();
+    keepSave();
     if(d.fields.length!==fields.length) say('ไฟล์นี้มาจากเช็คลิสต์คนละรุ่น ช่องอาจเลื่อน ตรวจอีกครั้ง');
   }
 
@@ -1348,6 +1370,44 @@ footer .q b{color:var(--gold);font-weight:600}
       }, fallback);
     }else{ fallback(); }
   });
+
+  // เติมวันที่ของวันนี้ให้อัตโนมัติ (ยังพิมพ์ทับแก้เองได้)
+  function fillToday(){
+    var f=document.querySelector('.meta input');
+    if(!f || f.value.trim()) return;
+    var d=new Date();
+    function two(n){ return n<10 ? '0'+n : ''+n; }
+    f.value=two(d.getDate())+'.'+two(d.getMonth()+1)+'.'+d.getFullYear();
+  }
+
+  // จำค่าช่องที่ติด data-keep ไว้ในเครื่อง จนกว่าจะพิมพ์เปลี่ยน
+  var KEEP='satang-keep-v1:';
+  var keepFields=Array.prototype.slice.call(document.querySelectorAll('[data-keep]'));
+
+  function keepSave(){
+    keepFields.forEach(function(f){
+      try{ localStorage.setItem(KEEP+f.getAttribute('data-keep'), f.value.trim()); }catch(err){}
+    });
+  }
+
+  function keepFill(){
+    keepFields.forEach(function(f){
+      if(f.value.trim()) return;
+      var v=null;
+      try{ v=localStorage.getItem(KEEP+f.getAttribute('data-keep')); }catch(err){}
+      if(v) f.value=v;
+    });
+  }
+
+  keepFields.forEach(function(f){
+    f.addEventListener('input', function(){
+      try{ localStorage.setItem(KEEP+f.getAttribute('data-keep'), f.value.trim()); }catch(err){}
+    });
+  });
+
+  fillToday();
+  keepFill();
+  calc();
 
   update();
 })();
