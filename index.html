@@ -458,9 +458,9 @@ footer .q b{color:var(--gold);font-weight:600}
 
   <div class="rr">
     <div class="row">
-      <label><span>Entry</span><input type="number" step="any" id="e" placeholder="4418" data-keep="entry"></label>
-      <label><span>Stop Loss</span><input type="number" step="any" id="s" placeholder="4396" data-keep="sl"></label>
-      <label><span>Take Profit</span><input type="number" step="any" id="t" placeholder="4485" data-keep="tp"></label>
+      <label><span>Entry</span><input type="number" step="any" id="e" placeholder="4418" data-keep="entry" data-daily></label>
+      <label><span>Stop Loss</span><input type="number" step="any" id="s" placeholder="4396" data-keep="sl" data-daily></label>
+      <label><span>Take Profit</span><input type="number" step="any" id="t" placeholder="4485" data-keep="tp" data-daily></label>
     </div>
 
     <input type="hidden" id="mode" value="pct">
@@ -659,11 +659,13 @@ footer .q b{color:var(--gold);font-weight:600}
     state.classList.toggle('ok', done);
     fill.classList.toggle('ok', done);
   }
-  boxes.forEach(function(b){ b.addEventListener('change', update); });
+  boxes.forEach(function(b){ b.addEventListener('change', function(){ update(); checksSave(); }); });
 
   document.getElementById('reset').addEventListener('click', function(){
     if(!confirm('ล้างทุกช่องในหน้านี้ ข้อมูลที่ยังไม่ได้บันทึกลงเครื่องจะหาย')) return;
     boxes.forEach(function(b){ b.checked = false; });
+    checksClear();
+    keepClearDaily();
     document.querySelectorAll('input[type=text],input[type=number],textarea,select')
       .forEach(function(f){ f.value=''; });
     fillToday();
@@ -1276,6 +1278,7 @@ footer .q b{color:var(--gold);font-weight:600}
     d.fields.forEach(function(v,i){ if(fields[i]) fields[i].value=v; });
     calc(); account(); update();
     keepSave();
+    checksSave();
     if(d.fields.length!==fields.length) say('ไฟล์นี้มาจากเช็คลิสต์คนละรุ่น ช่องอาจเลื่อน ตรวจอีกครั้ง');
   }
 
@@ -1384,29 +1387,87 @@ footer .q b{color:var(--gold);font-weight:600}
   var KEEP='satang-keep-v1:';
   var keepFields=Array.prototype.slice.call(document.querySelectorAll('[data-keep]'));
 
+  function keepKey(f){ return KEEP+f.getAttribute('data-keep'); }
+
   function keepSave(){
     keepFields.forEach(function(f){
-      try{ localStorage.setItem(KEEP+f.getAttribute('data-keep'), f.value.trim()); }catch(err){}
+      var v=f.value.trim();
+      try{
+        localStorage.setItem(keepKey(f),
+          f.hasAttribute('data-daily') ? JSON.stringify({ day:todayKey(), v:v }) : v);
+      }catch(err){}
+    });
+  }
+
+  // ล้างเฉพาะช่องที่ผูกกับวัน (Entry / SL / TP)
+  function keepClearDaily(){
+    keepFields.forEach(function(f){
+      if(!f.hasAttribute('data-daily')) return;
+      try{ localStorage.removeItem(keepKey(f)); }catch(err){}
     });
   }
 
   function keepFill(){
     keepFields.forEach(function(f){
       if(f.value.trim()) return;
-      var v=null;
-      try{ v=localStorage.getItem(KEEP+f.getAttribute('data-keep')); }catch(err){}
-      if(v) f.value=v;
+      var raw=null;
+      try{ raw=localStorage.getItem(keepKey(f)); }catch(err){}
+      if(!raw) return;
+      if(!f.hasAttribute('data-daily')){ f.value=raw; return; }
+      var d=null;
+      try{ d=JSON.parse(raw); }catch(err){}
+      if(!d || d.day!==todayKey()){                 // คนละวัน เริ่มใหม่
+        try{ localStorage.removeItem(keepKey(f)); }catch(err){}
+        return;
+      }
+      if(d.v) f.value=d.v;
     });
   }
 
   keepFields.forEach(function(f){
     f.addEventListener('input', function(){
-      try{ localStorage.setItem(KEEP+f.getAttribute('data-keep'), f.value.trim()); }catch(err){}
+      var v=f.value.trim();
+      try{
+        localStorage.setItem(keepKey(f),
+          f.hasAttribute('data-daily') ? JSON.stringify({ day:todayKey(), v:v }) : v);
+      }catch(err){}
     });
   });
 
+  // จำสถานะติ๊กไว้ภายในวันเดียวกัน ข้ามวันแล้วล้างเอง
+  var CHK='satang-checks-v1';
+
+  function todayKey(){
+    var d=new Date();
+    function two(n){ return n<10 ? '0'+n : ''+n; }
+    return d.getFullYear()+'-'+two(d.getMonth()+1)+'-'+two(d.getDate());
+  }
+
+  function checksSave(){
+    var box=document.querySelectorAll('.req');
+    var v=Array.prototype.map.call(box, function(b){ return b.checked ? 1 : 0; });
+    try{ localStorage.setItem(CHK, JSON.stringify({ day:todayKey(), v:v })); }catch(err){}
+  }
+
+  function checksClear(){
+    try{ localStorage.removeItem(CHK); }catch(err){}
+  }
+
+  function checksRestore(){
+    var raw=null;
+    try{ raw=localStorage.getItem(CHK); }catch(err){}
+    if(!raw) return;
+    var d=null;
+    try{ d=JSON.parse(raw); }catch(err){}
+    if(!d || !d.v){ checksClear(); return; }
+    if(d.day!==todayKey()){ checksClear(); return; }   // คนละวัน เริ่มใหม่
+    var box=document.querySelectorAll('.req');
+    d.v.forEach(function(x,i){ if(box[i]) box[i].checked=!!x; });
+  }
+
   fillToday();
   keepFill();
+  checksRestore();
   calc();
 
   update();
