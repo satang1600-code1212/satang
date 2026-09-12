@@ -83,6 +83,27 @@ h1{
 .meta label{display:flex;flex-direction:column;gap:2px;flex:1 1 120px}
 .meta span{font-size:14.5px;color:var(--faint);letter-spacing:.02em}
 
+.modal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.74);
+  display:flex;align-items:center;justify-content:center;padding:16px}
+.modal[hidden]{display:none}
+.modalbox{background:var(--panel);border:1px solid var(--rule);border-radius:14px;
+  width:100%;max-width:780px;max-height:88vh;display:flex;flex-direction:column;
+  padding:20px 22px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.modalhead{display:flex;justify-content:space-between;align-items:baseline;
+  gap:12px;margin-bottom:14px}
+.modaltitle{font-family:"Bai Jamjuree",sans-serif;font-weight:600;font-size:19px;color:var(--text)}
+.modalbody{overflow-y:auto;flex:1 1 auto;-webkit-overflow-scrolling:touch;min-height:0}
+.pager{display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  margin-top:14px;padding-top:14px;border-top:1px solid var(--rule-soft);flex:0 0 auto}
+.pager button{background:transparent;border:1px solid var(--rule-soft);color:var(--dim);
+  border-radius:8px;min-width:36px;padding:6px 9px;font-family:"Bai Jamjuree",sans-serif;
+  font-size:15px;cursor:pointer;transition:border-color .15s,color .15s}
+.pager button:hover:not(:disabled){border-color:var(--gold-soft);color:var(--text)}
+.pager button[aria-current="true"]{border-color:var(--gold);color:var(--gold)}
+.pager button:disabled{opacity:.35;cursor:default}
+.pager .gap{color:var(--faint);padding:0 2px}
+.pager .of{color:var(--faint);font-size:14.5px;margin-left:auto}
+
 input[type=text],input[type=number],textarea,select{
   background:transparent;border:none;border-bottom:1px solid var(--rule);
   color:var(--gold);font-family:"Bai Jamjuree",sans-serif;
@@ -490,8 +511,8 @@ footer .q b{color:var(--gold);font-weight:600}
   </div>
 
   <div class="fields">
-    <label><span>SL วางตรงนั้นเพราะ</span><input type="text" placeholder="ใต้ Low ที่สร้าง MSS"></label>
-    <label><span>TP เล็งไปที่</span><input type="text" placeholder="Liquidity ที่ 4,451"></label>
+    <label><span>SL วางตรงนั้นเพราะ</span><input type="text" id="slwhy" placeholder="ใต้ Low ที่สร้าง MSS"></label>
+    <label><span>TP เล็งไปที่</span><input type="text" id="tpwhy" placeholder="Liquidity ที่ 4,451"></label>
   </div>
 </section>
 
@@ -537,7 +558,7 @@ footer .q b{color:var(--gold);font-weight:600}
   <div class="fields" style="margin-left:0">
     <label><span>ไม้นี้ครบลิสต์ไหม</span><input type="text" placeholder="ครบ / ข้ามข้อ..."></label>
     <label><span>ผลลัพธ์</span><input type="text" id="outcome" placeholder="+3R / −1R"></label>
-    <label><span>เข้า–ออก เวลา</span><input type="text" placeholder="15:20 – 18:05"></label>
+    <label><span>เข้า–ออก เวลา</span><input type="text" id="times" placeholder="15:20 – 18:05"></label>
     <label><span>เซฟภาพชาร์ตตอนตัดสินใจแล้ว</span><input type="text" placeholder="แล้ว / ยัง"></label>
   </div>
 
@@ -563,10 +584,19 @@ footer .q b{color:var(--gold);font-weight:600}
       <span id="undonote">ยังไม่ได้บันทึกผลไม้นี้</span>
       <button class="linkbtn" id="undo" type="button" hidden>ย้อนกลับ</button>
     </div>
+    <div class="row" style="margin-top:18px;border-top:1px solid var(--rule-soft);padding-top:18px">
+      <label style="flex:1 1 100%"><span>ถ้าตัดสินใจไม่เข้า เพราะอะไร</span><input type="text" id="skipwhy" placeholder="ข่าว NFP ห่างไม่ถึง 30 นาที"></label>
+    </div>
+    <div class="btns" style="margin-top:14px">
+      <button class="btn" id="skip" type="button">ข้ามไม้นี้ ไม่เข้า</button>
+    </div>
+    <div class="memnote" style="margin-left:0">
+      <span id="skipnote">ไม้ที่ข้ามจะไม่แตะ Balance และไม่ถูกนับในอัตราชนะ แต่เก็บสถิติแยกไว้ให้</span>
+    </div>
   </div>
   <div style="margin-top:18px">
-    <label style="display:block;margin-bottom:14px"><span style="display:block;font-size:15.5px;color:#C3CBCD;margin-bottom:8px;line-height:1.6">ทำถูกในเชิงกระบวนการ ไม่ว่าผลจะเป็นอย่างไร</span><textarea></textarea></label>
-    <label style="display:block"><span style="display:block;font-size:15.5px;color:#C3CBCD;margin-bottom:8px;line-height:1.6">จะแก้อะไรในไม้หน้า</span><textarea></textarea></label>
+    <label style="display:block;margin-bottom:14px"><span style="display:block;font-size:15.5px;color:#C3CBCD;margin-bottom:8px;line-height:1.6">ทำถูกในเชิงกระบวนการ ไม่ว่าผลจะเป็นอย่างไร</span><textarea id="noteok"></textarea></label>
+    <label style="display:block"><span style="display:block;font-size:15.5px;color:#C3CBCD;margin-bottom:8px;line-height:1.6">จะแก้อะไรในไม้หน้า</span><textarea id="notefix"></textarea></label>
   </div>
   <div class="aside" style="margin-left:0;margin-top:20px">
     เก็บสถิติแยกระหว่างไม้ที่ <b>ครบลิสต์</b> กับไม้ที่ <b>ข้ามข้อ</b><br>
@@ -603,6 +633,15 @@ footer .q b{color:var(--gold);font-weight:600}
 
   <div class="split" id="split"></div>
 
+  <div class="split" id="skips" style="margin-top:14px"></div>
+
+  <div style="margin-top:26px;padding-top:20px;border-top:1px solid var(--rule-soft)">
+    <div class="btns">
+      <button class="btn" id="logopen" type="button">ดูบันทึกย้อนหลัง</button>
+    </div>
+    <div class="memnote" style="margin-left:0"><span id="logcount">ยังไม่มีบันทึก</span></div>
+  </div>
+
   <div class="btns" style="margin-top:18px">
     <button class="btn" id="csv" type="button">ส่งออกประวัติเป็น CSV</button>
     <button class="btn" id="wipe" type="button">ล้างประวัติทั้งหมด</button>
@@ -637,6 +676,26 @@ footer .q b{color:var(--gold);font-weight:600}
       <div class="gauge"><div class="fill" id="fill"></div></div>
     </div>
     <button class="reset" id="reset">เริ่มใหม่</button>
+  </div>
+</div>
+
+<div class="modal" id="logmodal" hidden>
+  <div class="modalbox" role="dialog" aria-modal="true" aria-label="บันทึกย้อนหลัง">
+    <div class="modalhead">
+      <span class="modaltitle">บันทึกย้อนหลัง</span>
+      <button class="linkbtn" id="logclose" type="button">ปิด</button>
+    </div>
+    <div class="btns" id="logfilters" style="margin-bottom:2px;flex:0 0 auto">
+      <button class="btn" type="button" data-f="all">ทั้งหมด</button>
+      <button class="btn" type="button" data-f="full">ครบลิสต์</button>
+      <button class="btn" type="button" data-f="part">ข้ามข้อ</button>
+      <button class="btn" type="button" data-f="skip">ไม่เข้า</button>
+    </div>
+    <div style="margin-bottom:10px;flex:0 0 auto">
+      <input type="text" id="logsearch" placeholder="ค้นหา วันที่ สินค้า เหตุผล เช่น 10.09.2026 หรือ NFP">
+    </div>
+    <div class="modalbody" id="logview"></div>
+    <div class="pager" id="logpager"></div>
   </div>
 </div>
 
@@ -1015,7 +1074,12 @@ footer .q b{color:var(--gold);font-weight:600}
                gross:+gross.toFixed(2), fee:cost, delta:delta, label:label,
                risk:isNaN(R)?'':+R.toFixed(2),
                r:(!isNaN(R)&&R>0)? +(delta/R).toFixed(2) : '',
-               n:passed, N:checks.length, bal:+(B+delta).toFixed(2) });
+               n:passed, N:checks.length, bal:+(B+delta).toFixed(2),
+               date:m.date||'', times:val('times'),
+               entry:val('e'), sl:val('s'), tp:val('t'),
+               slwhy:val('slwhy'), tpwhy:val('tpwhy'),
+               bias:keepVal('bias'), biaswhy:keepVal('bias-why'),
+               noteok:val('noteok'), notefix:val('notefix') });
     logWrite(); render();
 
     undoBtn.hidden=false;
@@ -1057,7 +1121,10 @@ footer .q b{color:var(--gold);font-weight:600}
     undoBtn.hidden=true;
     undoNote.textContent='ยังไม่ได้บันทึกผลไม้นี้';
     lastDelta=null;
-    log.pop(); logWrite(); render();
+    for(var li=log.length-1; li>=0; li--){
+      if(!isCash(log[li]) && !isSkip(log[li])){ log.splice(li,1); break; }
+    }
+    logWrite(); render();
     account(); resync(); memWrite();
     say('ย้อนกลับเรียบร้อย ลบไม้ล่าสุดออกจากประวัติแล้ว');
   });
@@ -1113,7 +1180,17 @@ footer .q b{color:var(--gold);font-weight:600}
   document.getElementById('wdr').addEventListener('click', function(){ moveCash(-1); });
 
   function isCash(x){ return x && x.type==='cash'; }
-  function trades(){ return log.filter(function(x){ return !isCash(x); }); }
+  function isSkip(x){ return x && x.type==='skip'; }
+  function trades(){ return log.filter(function(x){ return !isCash(x) && !isSkip(x); }); }
+
+  function val(id){
+    var el=document.getElementById(id);
+    return el ? el.value.trim() : '';
+  }
+  function keepVal(name){
+    var el=document.querySelector('[data-keep="'+name+'"]');
+    return el ? el.value.trim() : '';
+  }
 
   function baseCapital(){
     var st=parseFloat(start.value);
@@ -1142,6 +1219,7 @@ footer .q b{color:var(--gold);font-weight:600}
       curveEl.innerHTML='';
       curveCap.textContent='ยังไม่มีไม้ที่บันทึกผลไว้ กดปุ่มผลลัพธ์หลังปิดไม้ แล้วเส้นจะเริ่มขึ้นที่นี่';
       splitEl.innerHTML='เมื่อมีข้อมูลพอ ตรงนี้จะเทียบให้ว่าไม้ที่ <b>ครบลิสต์</b> กับไม้ที่ <b>ข้ามข้อ</b> ผลต่างกันจริงไหม';
+      renderSkips(); renderLog();
       return;
     }
 
@@ -1173,6 +1251,7 @@ footer .q b{color:var(--gold);font-weight:600}
     var pts=[], run=isNaN(base)? 0 : base;
     pts.push(run);
     log.forEach(function(x){
+      if(isSkip(x)) return;
       run += isCash(x)? x.amount : x.delta;
       pts.push(+run.toFixed(2));
     });
@@ -1215,6 +1294,330 @@ footer .q b{color:var(--gold);font-weight:600}
     }
     splitEl.innerHTML=line('ครบลิสต์',full)+'<br>'+line('ข้ามข้อ',part)+
       (n<20? '<br><span style="color:var(--faint)">ยังน้อยเกินกว่าจะสรุปอะไรได้ ตัวเลขนี้เริ่มมีความหมายราว 30 ไม้ขึ้นไป</span>':'');
+    renderSkips();
+    renderLog();
+  }
+
+  /* ---------- บันทึกย้อนหลังในหน้า ---------- */
+  var logEl=document.getElementById('logview'),
+      filterEl=document.getElementById('logfilters'),
+      pagerEl=document.getElementById('logpager'),
+      modalEl=document.getElementById('logmodal'),
+      countEl=document.getElementById('logcount'),
+      logFilter='all',
+      logQuery='',
+      searchEl=document.getElementById('logsearch'),
+      logPage=1,
+      PER=20,
+      logOpen={};
+
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"]/g, function(c){
+      return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c];
+    });
+  }
+
+  function fmtWhen(iso){
+    var d=new Date(iso);
+    if(isNaN(d.getTime())) return '';
+    function two(n){ return n<10?'0'+n:''+n; }
+    return two(d.getDate())+'.'+two(d.getMonth()+1)+'.'+d.getFullYear()+
+           '  '+two(d.getHours())+':'+two(d.getMinutes());
+  }
+
+  function detailRow(k,v){
+    if(v===''||v===undefined||v===null) return '';
+    return '<div style="display:flex;gap:10px;margin-top:5px">'+
+           '<span style="color:var(--faint);flex:0 0 116px">'+k+'</span>'+
+           '<span style="flex:1">'+esc(v)+'</span></div>';
+  }
+
+  function logMatches(x){
+    var ok;
+    if(logFilter==='all') ok = !isCash(x);
+    else if(logFilter==='skip') ok = isSkip(x);
+    else if(isCash(x) || isSkip(x)) ok = false;
+    else {
+      var full = x.N && x.n===x.N;
+      ok = (logFilter==='full') ? !!full : !full;
+    }
+    if(!ok) return false;
+    if(!logQuery) return true;
+    var hay=[x.date, fmtWhen(x.t), x.times, x.sym, x.tf, x.why, x.label,
+             x.slwhy, x.tpwhy, x.bias, x.biaswhy, x.noteok, x.notefix,
+             x.entry, x.sl, x.tp].join(' ').toLowerCase();
+    return hay.indexOf(logQuery)!==-1;
+  }
+
+  function renderPager(total, pages){
+    if(pages<=1){
+      pagerEl.innerHTML = total
+        ? '<span class="of">ทั้งหมด '+total+' รายการ</span>'
+        : '';
+      return;
+    }
+    var nums=[];
+    for(var i=1;i<=pages;i++){
+      if(i===1 || i===pages || Math.abs(i-logPage)<=1) nums.push(i);
+      else if(nums[nums.length-1]!=='gap') nums.push('gap');
+    }
+    var html='<button type="button" data-p="'+(logPage-1)+'"'+
+             (logPage===1?' disabled':'')+'>‹</button>';
+    nums.forEach(function(v){
+      html += (v==='gap')
+        ? '<span class="gap">…</span>'
+        : '<button type="button" data-p="'+v+'"'+(v===logPage?' aria-current="true"':'')+'>'+v+'</button>';
+    });
+    html+='<button type="button" data-p="'+(logPage+1)+'"'+
+          (logPage===pages?' disabled':'')+'>›</button>'+
+          '<span class="of">'+total+' รายการ  หน้า '+logPage+'/'+pages+'</span>';
+    pagerEl.innerHTML=html;
+  }
+
+  function renderLog(){
+    Array.prototype.forEach.call(filterEl.children, function(b){
+      b.className='btn'+(b.getAttribute('data-f')===logFilter?' primary':'');
+    });
+
+    var all=[];
+    log.forEach(function(x,i){ if(logMatches(x)) all.push({ x:x, i:i }); });
+    all.reverse();
+
+    var total=all.length;
+    var pages=Math.max(1, Math.ceil(total/PER));
+    if(logPage>pages) logPage=pages;
+    if(logPage<1) logPage=1;
+
+    var n=trades().length, s=log.filter(isSkip).length;
+    countEl.textContent = (n+s)
+      ? ('บันทึกไว้ '+n+' ไม้ที่เข้าจริง และ '+s+' ไม้ที่ไม่เข้า')
+      : 'ยังไม่มีบันทึก';
+
+    if(!total){
+      logEl.innerHTML='<div style="color:var(--faint);padding:14px 0">'+
+        (logQuery? 'ไม่พบบันทึกที่ตรงกับคำค้นนี้' : 'ยังไม่มีบันทึกในหมวดนี้')+'</div>';
+      renderPager(0,1);
+      return;
+    }
+
+    var rows=all.slice((logPage-1)*PER, logPage*PER);
+
+    logEl.innerHTML=rows.map(function(o){
+      var x=o.x, open=!!logOpen[o.i], skip=isSkip(x);
+      var tag, cls;
+      if(skip){
+        tag = x.would>0 ? 'ไม่เข้า · ถ้าเข้าคงชนะ'
+            : x.would<0 ? 'ไม่เข้า · ถ้าเข้าคงแพ้'
+            : 'ไม่เข้า · ยังไม่รู้ผล';
+        cls = x.would>0 ? 'var(--ember)' : (x.would<0 ? 'var(--sage)' : 'var(--faint)');
+      }else{
+        tag = (x.delta>0?'+':'')+money(x.delta)+(x.r!==''&&x.r!==undefined?('   '+(x.r>0?'+':'')+x.r+'R'):'');
+        cls = x.delta>0?'var(--sage)':(x.delta<0?'var(--ember)':'var(--gold)');
+      }
+
+      var head='<div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">'+
+        '<span style="color:var(--dim);font-size:14.5px">'+
+          (x.date? esc(x.date) : fmtWhen(x.t))+
+          (x.times?('   '+esc(x.times)):'')+
+          (x.sym?('   '+esc(x.sym)):'')+(x.tf?('   '+esc(x.tf)):'')+
+          '   <span style="color:var(--faint)">ติ๊ก '+(x.n===undefined?'—':x.n+'/'+x.N)+'</span></span>'+
+        '<span style="color:'+cls+';white-space:nowrap">'+esc(tag)+'</span></div>';
+
+      var body='';
+      if(open){
+        body+='<div style="margin-top:10px;font-size:15px;line-height:1.6">';
+        body+=detailRow('วันที่เทรด', x.date);
+        body+=detailRow('เข้า–ออก เวลา', x.times);
+        body+=detailRow('เวลาที่กดบันทึก', fmtWhen(x.t));
+        body+=detailRow('Entry', x.entry);
+        body+=detailRow('Stop Loss', x.sl);
+        body+=detailRow('Take Profit', x.tp);
+        body+=detailRow('SL เพราะ', x.slwhy);
+        body+=detailRow('TP เล็งที่', x.tpwhy);
+        body+=detailRow('ไบแอส', x.bias);
+        body+=detailRow('ไบแอสเพราะ', x.biaswhy);
+        if(skip){
+          body+=detailRow('ไม่เข้าเพราะ', x.why);
+          body+=detailRow('เป้าที่วางไว้', x.rr!==''&&x.rr!==undefined? x.rr+'R' : '');
+        }else{
+          body+=detailRow('ผลลัพธ์', x.label);
+          body+=detailRow('ผลดิบ', x.gross!==undefined? money(x.gross):'');
+          body+=detailRow('ค่าธรรมเนียม', x.fee? money(x.fee):'');
+          body+=detailRow('1R', x.risk!==''&&x.risk!==undefined? money(x.risk):'');
+          body+=detailRow('Balance หลังไม้', x.bal!==undefined? money(x.bal):'');
+          body+=detailRow('ทำถูกอะไร', x.noteok);
+          body+=detailRow('จะแก้อะไร', x.notefix);
+        }
+        body+='</div>';
+        if(skip){
+          body+='<div style="margin-top:12px">'+
+            '<button class="linkbtn" data-skipwin="'+o.i+'" type="button">ถ้าเข้าคงชนะ</button>   '+
+            '<button class="linkbtn" data-skiplose="'+o.i+'" type="button">ถ้าเข้าคงแพ้</button>   '+
+            '<button class="linkbtn" data-skipclear="'+o.i+'" type="button">ล้างผล</button>   '+
+            '<button class="linkbtn" data-skipdel="'+o.i+'" type="button">ลบ</button></div>';
+        }
+        if(!x.entry && !x.sl && !x.tp){
+          body+='<div style="margin-top:10px;color:var(--faint);font-size:14.5px">'+
+                'ไม้นี้บันทึกไว้ก่อนที่ระบบจะเก็บ Entry SL TP จึงไม่มีข้อมูลส่วนนั้น</div>';
+        }
+      }
+
+      return '<div style="padding:13px 0;border-top:1px solid var(--rule-soft)">'+
+        '<div data-logtoggle="'+o.i+'" style="cursor:pointer">'+head+'</div>'+body+'</div>';
+    }).join('');
+
+    renderPager(total, pages);
+  }
+
+  pagerEl.addEventListener('click', function(ev){
+    var b=ev.target.closest && ev.target.closest('button[data-p]');
+    if(!b || b.disabled) return;
+    var p=parseInt(b.getAttribute('data-p'),10);
+    if(isNaN(p)) return;
+    logPage=p;
+    renderLog();
+    logEl.scrollTop=0;
+  });
+
+  searchEl.addEventListener('input', function(){
+    logQuery=searchEl.value.trim().toLowerCase();
+    logPage=1;
+    renderLog();
+    logEl.scrollTop=0;
+  });
+
+  function openLog(){
+    modalEl.hidden=false;
+    document.body.style.overflow='hidden';
+    renderLog();
+    logEl.scrollTop=0;
+  }
+  function closeLog(){
+    modalEl.hidden=true;
+    document.body.style.overflow='';
+  }
+
+  document.getElementById('logopen').addEventListener('click', openLog);
+  document.getElementById('logclose').addEventListener('click', closeLog);
+  modalEl.addEventListener('click', function(ev){ if(ev.target===modalEl) closeLog(); });
+  document.addEventListener('keydown', function(ev){
+    if(ev.key==='Escape' && !modalEl.hidden) closeLog();
+  });
+
+  filterEl.addEventListener('click', function(ev){
+    var b=ev.target.closest && ev.target.closest('button[data-f]');
+    if(!b) return;
+    logFilter=b.getAttribute('data-f');
+    logPage=1;
+    renderLog();
+    logEl.scrollTop=0;
+  });
+
+  logEl.addEventListener('click', function(ev){
+    var t=ev.target.closest && ev.target.closest('[data-logtoggle]');
+    if(t){
+      var k=t.getAttribute('data-logtoggle');
+      logOpen[k]=!logOpen[k];
+      renderLog();
+      return;
+    }
+    var b=ev.target.closest && ev.target.closest('button');
+    if(!b) return;
+    var iw=b.getAttribute('data-skipwin'),
+        il=b.getAttribute('data-skiplose'),
+        ic=b.getAttribute('data-skipclear'),
+        id=b.getAttribute('data-skipdel');
+    var i=parseInt(iw||il||ic||id, 10);
+    if(isNaN(i) || !isSkip(log[i])) return;
+    if(id!==null){
+      if(!confirm('ลบบันทึกไม้ที่ไม่เข้านี้')) return;
+      log.splice(i,1); logOpen={};
+    }else{
+      log[i].would = (iw!==null) ? 1 : (il!==null ? -1 : 0);
+    }
+    logWrite(); render();
+  });
+
+  /* ---------- ไม้ที่ตัดสินใจไม่เข้า ---------- */
+  var skipEl=document.getElementById('skips'),
+      skipWhy=document.getElementById('skipwhy'),
+      skipNote=document.getElementById('skipnote');
+
+  document.getElementById('skip').addEventListener('click', function(){
+    var why=skipWhy.value.trim();
+    if(!why){ say('เขียนเหตุผลสั้น ๆ ก่อน จะได้ย้อนดูได้ว่าติดกฎข้อไหน'); skipWhy.focus(); return; }
+    var m=meta(), passed=checks.filter(function(c){ return c.checked; }).length;
+    var rr=rrRatio();
+    log.push({ type:'skip', t:new Date().toISOString(),
+               sym:m.sym||'', tf:m.tf||'', why:why,
+               n:passed, N:checks.length,
+               rr:isNaN(rr)? '' : +rr.toFixed(2), would:0,
+               date:m.date||'', times:val('times'),
+               entry:val('e'), sl:val('s'), tp:val('t'),
+               slwhy:val('slwhy'), tpwhy:val('tpwhy'),
+               bias:keepVal('bias'), biaswhy:keepVal('bias-why') });
+    logWrite(); render();
+    skipWhy.value='';
+    skipNote.textContent='บันทึกไว้แล้ว ไปดูผลย้อนหลังในส่วนการเติบโตของพอร์ต แล้วค่อยกดว่าถ้าเข้าจะได้หรือเสีย';
+    say('บันทึกไม้ที่ข้ามแล้ว ไม่กระทบ Balance');
+  });
+
+  function pct(w,l){ return (w+l) ? Math.round(w/(w+l)*100)+'%' : '—'; }
+
+  function skipSummary(arr, name){
+    if(!arr.length) return '<div style="margin-top:10px;color:var(--faint)">'+name+' ยังไม่มีข้อมูล</div>';
+    var marked=arr.filter(function(x){ return x.would; });
+    var w=marked.filter(function(x){ return x.would>0; }).length;
+    var l=marked.filter(function(x){ return x.would<0; }).length;
+    var netR=marked.reduce(function(a,x){
+      return a + (x.would>0 ? (parseFloat(x.rr)||1) : -1);
+    },0);
+    netR=+netR.toFixed(2);
+    var out='<div style="margin-top:10px"><b>'+name+' '+arr.length+' ครั้ง</b>';
+    if(!marked.length){
+      out+='<br><span style="color:var(--faint)">ยังไม่ได้กรอกผลย้อนหลัง</span></div>';
+      return out;
+    }
+    var cls=netR>0?'var(--ember)':(netR<0?'var(--sage)':'var(--gold)');
+    out+='<br>กรอกผลแล้ว '+marked.length+' ครั้ง   ถ้าเข้าจะชนะ <b>'+pct(w,l)+'</b> '+
+         '(ชนะ '+w+' แพ้ '+l+')   รวม <b style="color:'+cls+'">'+(netR>0?'+':'')+netR+'R</b></div>';
+    return out;
+  }
+
+  function renderSkips(){
+    var sk=log.filter(isSkip);
+    if(!sk.length){
+      skipEl.innerHTML='<span style="color:var(--faint)">ยังไม่มีไม้ที่ตัดสินใจไม่เข้า '+
+        'เมื่อข้ามเพราะกฎข้อไหน กดปุ่มไว้ แล้วตรงนี้จะบอกว่ากฎนั้นรักษาเงินหรือกินเงิน</span>';
+      return;
+    }
+    var full=sk.filter(function(x){ return x.N && x.n===x.N; });
+    var part=sk.filter(function(x){ return !(x.N && x.n===x.N); });
+    var marked=sk.filter(function(x){ return x.would; });
+
+    var html='<b>ไม้ที่ตัดสินใจไม่เข้า '+sk.length+' ครั้ง</b>';
+    html+=skipSummary(full, 'เซ็ตอัพครบลิสต์แต่ไม่เข้า');
+    html+=skipSummary(part, 'ลิสต์ไม่ครบอยู่แล้ว');
+
+    if(marked.length){
+      var fm=full.filter(function(x){ return x.would; });
+      var tr=trades().filter(function(x){ return x.N && x.n===x.N; });
+      var tw=tr.filter(function(x){ return x.delta>0; }).length;
+      var tl=tr.filter(function(x){ return x.delta<0; }).length;
+      if(fm.length && (tw+tl)){
+        var fw=fm.filter(function(x){ return x.would>0; }).length;
+        var fl=fm.filter(function(x){ return x.would<0; }).length;
+        html+='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--rule-soft)">'+
+              'เทียบเฉพาะไม้ที่ครบลิสต์   เข้าจริงชนะ <b>'+pct(tw,tl)+'</b>   '+
+              'ที่ข้ามไปถ้าเข้าจะชนะ <b>'+pct(fw,fl)+'</b></div>';
+      }
+      html+='<div style="margin-top:10px;color:var(--faint)">'+
+        (marked.length<30
+          ? 'ยังน้อยเกินกว่าจะสรุป ตัวเลขนี้เริ่มเชื่อได้ราว 30 ครั้งขึ้นไป'
+          : 'ตัวเลขเริ่มมีน้ำหนักแล้ว แต่ยังเป็นการประมาณ เพราะนับว่าชนะคือถึงเป้าเต็มและแพ้คือเสียหนึ่ง R เต็ม')+
+        '</div>';
+    }
+    skipEl.innerHTML=html;
   }
 
   start.addEventListener('input', render);
@@ -1222,12 +1625,18 @@ footer .q b{color:var(--gold);font-weight:600}
   document.getElementById('csv').addEventListener('click', function(){
     if(!log.length){ say('ยังไม่มีประวัติให้ส่งออก'); return; }
     
-    var rows=[['วันเวลา','สินค้า','TF','ผลดิบ','ค่าธรรมเนียม','สุทธิ','1R','ผลเป็น R','ผลลัพธ์','ติ๊กผ่าน','จากทั้งหมด','Balance']];
+    var rows=[['วันเวลาที่บันทึก','วันที่เทรด','เข้า–ออก เวลา','สินค้า','TF','ผลดิบ','ค่าธรรมเนียม','สุทธิ','1R','ผลเป็น R','ผลลัพธ์','ติ๊กผ่าน','จากทั้งหมด','Balance','Entry','SL','TP','SL เพราะ','TP เล็งที่','ไบแอส','ไบแอสเพราะ','ทำถูกอะไร','จะแก้อะไร']];
+    function d(x){ return [x.entry||'', x.sl||'', x.tp||'', x.slwhy||'', x.tpwhy||'',
+                           x.bias||'', x.biaswhy||'', x.noteok||'', x.notefix||'']; }
     log.forEach(function(x){
-      if(isCash(x)) rows.push([x.t,'','','','',x.amount,'','',x.label,'','',x.bal]);
-      else rows.push([x.t, x.sym, x.tf, x.gross, x.fee, x.delta,
+      if(isCash(x)) rows.push([x.t,'','','','','','',x.amount,'','',x.label,'','',x.bal,'','','','','','','','','']);
+      else if(isSkip(x)) rows.push([x.t, x.date||'', x.times||'', x.sym, x.tf, '', '', '', '',
+                      x.would>0? (x.rr||'') : (x.would<0? -1 : ''),
+                      'ไม่เข้า: '+(x.why||'')+(x.would? (x.would>0?' (ถ้าเข้าคงชนะ)':' (ถ้าเข้าคงแพ้)') : ''),
+                      x.n, x.N, ''].concat(d(x)));
+      else rows.push([x.t, x.date||'', x.times||'', x.sym, x.tf, x.gross, x.fee, x.delta,
                       x.risk===undefined?'':x.risk, x.r===undefined?'':x.r,
-                      x.label, x.n, x.N, x.bal]);
+                      x.label, x.n, x.N, x.bal].concat(d(x)));
     });
     var csv='\ufeff'+rows.map(function(r){
       return r.map(function(c){ return '"'+String(c).replace(/"/g,'""')+'"'; }).join(',');
