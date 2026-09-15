@@ -1075,11 +1075,11 @@ footer .q b{color:var(--gold);font-weight:600}
                risk:isNaN(R)?'':+R.toFixed(2),
                r:(!isNaN(R)&&R>0)? +(delta/R).toFixed(2) : '',
                n:passed, N:checks.length, bal:+(B+delta).toFixed(2),
-               date:m.date||'', times:val('times'),
-               entry:val('e'), sl:val('s'), tp:val('t'),
-               slwhy:val('slwhy'), tpwhy:val('tpwhy'),
+               date:m.date||'', times:fieldVal('times'),
+               entry:fieldVal('e'), sl:fieldVal('s'), tp:fieldVal('t'),
+               slwhy:fieldVal('slwhy'), tpwhy:fieldVal('tpwhy'),
                bias:keepVal('bias'), biaswhy:keepVal('bias-why'),
-               noteok:val('noteok'), notefix:val('notefix') });
+               noteok:fieldVal('noteok'), notefix:fieldVal('notefix') });
     logWrite(); render();
 
     undoBtn.hidden=false;
@@ -1157,6 +1157,15 @@ footer .q b{color:var(--gold);font-weight:600}
     var E=parseFloat(eq.value);
     var amt=sign*v;
 
+    if(sign<0 && v>B){
+      say('ถอนได้ไม่เกิน '+money(B)+' ซึ่งเป็นยอด Balance ที่มีอยู่');
+      cashVal.className='rrval fail';
+      cashVal.textContent='ถอนไม่ได้';
+      cashMsg.innerHTML='จำนวนที่จะถอน '+money(v)+' มากกว่า Balance ที่มี '+money(B)+
+        '<br>ถ้าตั้งใจจะปิดพอร์ต ให้ถอนเท่ากับยอดที่เหลือพอดี';
+      return;
+    }
+
     bal.value=(B+amt).toFixed(2);
     if(!isNaN(E)) eq.value=(E+amt).toFixed(2);
 
@@ -1183,7 +1192,7 @@ footer .q b{color:var(--gold);font-weight:600}
   function isSkip(x){ return x && x.type==='skip'; }
   function trades(){ return log.filter(function(x){ return !isCash(x) && !isSkip(x); }); }
 
-  function val(id){
+  function fieldVal(id){
     var el=document.getElementById(id);
     return el ? el.value.trim() : '';
   }
@@ -1552,9 +1561,9 @@ footer .q b{color:var(--gold);font-weight:600}
                sym:m.sym||'', tf:m.tf||'', why:why,
                n:passed, N:checks.length,
                rr:isNaN(rr)? '' : +rr.toFixed(2), would:0,
-               date:m.date||'', times:val('times'),
-               entry:val('e'), sl:val('s'), tp:val('t'),
-               slwhy:val('slwhy'), tpwhy:val('tpwhy'),
+               date:m.date||'', times:fieldVal('times'),
+               entry:fieldVal('e'), sl:fieldVal('s'), tp:fieldVal('t'),
+               slwhy:fieldVal('slwhy'), tpwhy:fieldVal('tpwhy'),
                bias:keepVal('bias'), biaswhy:keepVal('bias-why') });
     logWrite(); render();
     skipWhy.value='';
