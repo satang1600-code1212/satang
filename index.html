@@ -583,6 +583,7 @@ footer .q b{color:var(--gold);font-weight:600}
     <div class="memnote" style="margin-left:0">
       <span id="undonote">ยังไม่ได้บันทึกผลไม้นี้</span>
       <button class="linkbtn" id="undo" type="button" hidden>ย้อนกลับ</button>
+      <button class="linkbtn" id="afterlast" type="button" hidden>บันทึกสิ่งที่เกิดหลังปิดไม้</button>
     </div>
     <div class="row" style="margin-top:18px;border-top:1px solid var(--rule-soft);padding-top:18px">
       <label style="flex:1 1 100%"><span>ถ้าตัดสินใจไม่เข้า เพราะอะไร</span><input type="text" id="skipwhy" placeholder="ข่าว NFP ห่างไม่ถึง 30 นาที"></label>
@@ -634,6 +635,8 @@ footer .q b{color:var(--gold);font-weight:600}
   <div class="split" id="split"></div>
 
   <div class="split" id="skips" style="margin-top:14px"></div>
+
+  <div class="split" id="afterstats" style="margin-top:14px"></div>
 
   <div style="margin-top:26px;padding-top:20px;border-top:1px solid var(--rule-soft)">
     <div class="btns">
@@ -1028,7 +1031,8 @@ footer .q b{color:var(--gold);font-weight:600}
   /* ---------- settle the trade into the account ---------- */
   var outcome=document.getElementById('outcome'), manual=document.getElementById('manual'),
       closemsg=document.getElementById('closemsg'), closeval=document.getElementById('closeval'),
-      undoBtn=document.getElementById('undo'), undoNote=document.getElementById('undonote');
+      undoBtn=document.getElementById('undo'), undoNote=document.getElementById('undonote'),
+      afterBtn=document.getElementById('afterlast');
   var lastDelta=null, lastOutcome='';
 
   function riskAmount(){
@@ -1083,6 +1087,7 @@ footer .q b{color:var(--gold);font-weight:600}
     logWrite(); render();
 
     undoBtn.hidden=false;
+    afterBtn.hidden=false;
     undoNote.textContent='บันทึกผลแล้ว '+label;
     account(); resync(); memWrite();
     say('อัปเดตบัญชีแล้ว '+(delta>0?'+':'')+money(delta));
@@ -1228,7 +1233,7 @@ footer .q b{color:var(--gold);font-weight:600}
       curveEl.innerHTML='';
       curveCap.textContent='ยังไม่มีไม้ที่บันทึกผลไว้ กดปุ่มผลลัพธ์หลังปิดไม้ แล้วเส้นจะเริ่มขึ้นที่นี่';
       splitEl.innerHTML='เมื่อมีข้อมูลพอ ตรงนี้จะเทียบให้ว่าไม้ที่ <b>ครบลิสต์</b> กับไม้ที่ <b>ข้ามข้อ</b> ผลต่างกันจริงไหม';
-      renderSkips(); renderLog();
+      renderSkips(); renderAfter(); renderLog();
       return;
     }
 
@@ -1304,7 +1309,69 @@ footer .q b{color:var(--gold);font-weight:600}
     splitEl.innerHTML=line('ครบลิสต์',full)+'<br>'+line('ข้ามข้อ',part)+
       (n<20? '<br><span style="color:var(--faint)">ยังน้อยเกินกว่าจะสรุปอะไรได้ ตัวเลขนี้เริ่มมีความหมายราว 30 ไม้ขึ้นไป</span>':'');
     renderSkips();
+    renderAfter();
     renderLog();
+  }
+
+  var AFTER={ run:'ราคาไปต่อทางเดิม', rev:'ราคากลับตัวหลังปิด', na:'ยังไม่ชัด' };
+
+  function afterEditor(x, i){
+    var cur=x.after||'';
+    var btn=function(k){
+      return '<button class="btn'+(cur===k?' primary':'')+'" type="button" '+
+             'data-after="'+k+'" data-i="'+i+'">'+AFTER[k]+'</button>';
+    };
+    return '<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--rule-soft)">'+
+      '<div style="color:var(--faint);font-size:14.5px;margin-bottom:8px">'+
+        'หลังตัดสินใจปิดแล้วเกิดอะไรขึ้น</div>'+
+      '<div class="btns" style="margin-bottom:10px">'+btn('run')+btn('rev')+btn('na')+'</div>'+
+      '<textarea data-afternote="'+i+'" rows="2" '+
+        'placeholder="ปิดที่ 1R แล้วราคาวิ่งต่ออีก 2R ไปชน Liquidity ที่เล็งไว้พอดี">'+
+        esc(x.afterNote||'')+'</textarea>'+
+      '<div style="color:var(--faint);font-size:14.5px;margin:12px 0 6px">'+
+        'จะปรับปรุงอะไร</div>'+
+      '<textarea data-afterfix="'+i+'" rows="2" '+
+        'placeholder="ครั้งหน้าถ้าโครงสร้างยังไม่เสีย จะไม่ปิดก่อนถึง Liquidity ที่เล็งไว้">'+
+        esc(x.afterFix||'')+'</textarea>'+
+      '<div style="margin-top:8px"><button class="linkbtn" data-aftersave="'+i+'" '+
+        'type="button">บันทึกบันทึกนี้</button></div>'+
+    '</div>';
+  }
+
+  function readAfter(i){
+    var note=logEl.querySelector('[data-afternote="'+i+'"]');
+    var fix=logEl.querySelector('[data-afterfix="'+i+'"]');
+    if(note) log[i].afterNote=note.value.trim();
+    if(fix) log[i].afterFix=fix.value.trim();
+  }
+
+  function renderAfter(){
+    var el=document.getElementById('afterstats');
+    var tr=trades();
+    var marked=tr.filter(function(x){ return x.after; });
+    if(!marked.length){
+      el.innerHTML='<span style="color:var(--faint)">ยังไม่ได้บันทึกว่าหลังปิดไม้แล้วราคาไปทางไหน '+
+        'กดดูบันทึกย้อนหลัง เลือกไม้ แล้วกรอกไว้ จะได้รู้ว่าตัวเองปิดเร็วไปหรือเปล่า</span>';
+      return;
+    }
+    var run=marked.filter(function(x){ return x.after==='run'; });
+    var rev=marked.filter(function(x){ return x.after==='rev'; });
+    var fixes=marked.filter(function(x){ return x.afterFix; });
+    var html='<b>หลังปิดไม้ บันทึกไว้ '+marked.length+' ไม้</b>'+
+      '<br>ราคาไปต่อทางเดิม '+run.length+'   กลับตัวหลังปิด '+rev.length+
+      '   ยังไม่ชัด '+(marked.length-run.length-rev.length);
+    if(fixes.length){
+      html+='<br>เขียนสิ่งที่จะปรับปรุงไว้ '+fixes.length+' ไม้';
+    }
+    if(marked.length>=8){
+      var rr=run.length, rv=rev.length;
+      html+='<br><span style="color:var(--faint)">'+
+        (rr>rv*2 ? 'ราคาไปต่อบ่อยกว่ากลับตัวอยู่มาก ลองย้อนอ่านสิ่งที่เขียนไว้ว่าเหตุผลที่ปิดซ้ำกันไหม'
+         : (rv>rr*2 ? 'ส่วนใหญ่ราคากลับตัวหลังปิด แปลว่าจังหวะปิดของคุณใช้ได้'
+                    : 'สองฝั่งพอ ๆ กัน ยังไม่มีรูปแบบชัดว่าปิดเร็วหรือช้าเกินไป'))+
+        '</span>';
+    }
+    el.innerHTML=html;
   }
 
   /* ---------- บันทึกย้อนหลังในหน้า ---------- */
@@ -1464,6 +1531,8 @@ footer .q b{color:var(--gold);font-weight:600}
             '<button class="linkbtn" data-skiplose="'+o.i+'" type="button">ถ้าเข้าคงแพ้</button>   '+
             '<button class="linkbtn" data-skipclear="'+o.i+'" type="button">ล้างผล</button>   '+
             '<button class="linkbtn" data-skipdel="'+o.i+'" type="button">ลบ</button></div>';
+        }else{
+          body+=afterEditor(x, o.i);
         }
         if(!x.entry && !x.sl && !x.tp){
           body+='<div style="margin-top:10px;color:var(--faint);font-size:14.5px">'+
@@ -1507,6 +1576,17 @@ footer .q b{color:var(--gold);font-weight:600}
   }
 
   document.getElementById('logopen').addEventListener('click', openLog);
+
+  document.getElementById('afterlast').addEventListener('click', function(){
+    var last=-1;
+    for(var i=log.length-1;i>=0;i--){
+      if(!isCash(log[i]) && !isSkip(log[i])){ last=i; break; }
+    }
+    if(last<0){ say('ยังไม่มีไม้ที่บันทึกผลไว้'); return; }
+    logFilter='all'; logQuery=''; searchEl.value=''; logPage=1;
+    logOpen={}; logOpen[last]=true;
+    openLog();
+  });
   document.getElementById('logclose').addEventListener('click', closeLog);
   modalEl.addEventListener('click', function(ev){ if(ev.target===modalEl) closeLog(); });
   document.addEventListener('keydown', function(ev){
@@ -1532,6 +1612,18 @@ footer .q b{color:var(--gold);font-weight:600}
     }
     var b=ev.target.closest && ev.target.closest('button');
     if(!b) return;
+
+    var ai=b.getAttribute('data-i'), as=b.getAttribute('data-aftersave');
+    if(ai!==null || as!==null){
+      var j=parseInt(ai!==null?ai:as, 10);
+      if(isNaN(j) || !log[j]) return;
+      readAfter(j);
+      if(ai!==null) log[j].after=b.getAttribute('data-after');
+      logWrite(); render();
+      say('บันทึกสิ่งที่เกิดหลังปิดไม้แล้ว');
+      return;
+    }
+
     var iw=b.getAttribute('data-skipwin'),
         il=b.getAttribute('data-skiplose'),
         ic=b.getAttribute('data-skipclear'),
@@ -1634,11 +1726,12 @@ footer .q b{color:var(--gold);font-weight:600}
   document.getElementById('csv').addEventListener('click', function(){
     if(!log.length){ say('ยังไม่มีประวัติให้ส่งออก'); return; }
     
-    var rows=[['วันเวลาที่บันทึก','วันที่เทรด','เข้า–ออก เวลา','สินค้า','TF','ผลดิบ','ค่าธรรมเนียม','สุทธิ','1R','ผลเป็น R','ผลลัพธ์','ติ๊กผ่าน','จากทั้งหมด','Balance','Entry','SL','TP','SL เพราะ','TP เล็งที่','ไบแอส','ไบแอสเพราะ','ทำถูกอะไร','จะแก้อะไร']];
+    var rows=[['วันเวลาที่บันทึก','วันที่เทรด','เข้า–ออก เวลา','สินค้า','TF','ผลดิบ','ค่าธรรมเนียม','สุทธิ','1R','ผลเป็น R','ผลลัพธ์','ติ๊กผ่าน','จากทั้งหมด','Balance','Entry','SL','TP','SL เพราะ','TP เล็งที่','ไบแอส','ไบแอสเพราะ','ทำถูกอะไร','จะแก้อะไร','หลังปิดไม้','บันทึกหลังปิด','จะปรับปรุงอะไร']];
     function d(x){ return [x.entry||'', x.sl||'', x.tp||'', x.slwhy||'', x.tpwhy||'',
-                           x.bias||'', x.biaswhy||'', x.noteok||'', x.notefix||'']; }
+                           x.bias||'', x.biaswhy||'', x.noteok||'', x.notefix||'',
+                           AFTER[x.after]||'', x.afterNote||'', x.afterFix||'']; }
     log.forEach(function(x){
-      if(isCash(x)) rows.push([x.t,'','','','','','',x.amount,'','',x.label,'','',x.bal,'','','','','','','','','']);
+      if(isCash(x)) rows.push([x.t,'','','','','','',x.amount,'','',x.label,'','',x.bal,'','','','','','','','','','','','']);
       else if(isSkip(x)) rows.push([x.t, x.date||'', x.times||'', x.sym, x.tf, '', '', '', '',
                       x.would>0? (x.rr||'') : (x.would<0? -1 : ''),
                       'ไม่เข้า: '+(x.why||'')+(x.would? (x.would>0?' (ถ้าเข้าคงชนะ)':' (ถ้าเข้าคงแพ้)') : ''),
